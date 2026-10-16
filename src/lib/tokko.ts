@@ -281,6 +281,10 @@ export function getPropiedades(): Promise<Propiedad[]> {
 async function cargar(): Promise<Propiedad[]> {
   const key = process.env.TOKKO_API_KEY || import.meta.env.TOKKO_API_KEY;
   if (!key) {
+    // En Vercel o en CI, sin clave el build falla: nunca se publican las propiedades de ejemplo
+    if (process.env.VERCEL || process.env.CI) {
+      throw new Error('[tokko] Falta TOKKO_API_KEY en las variables de entorno. Se cancela la publicación.');
+    }
     console.warn('\n[tokko] Sin TOKKO_API_KEY: se usan propiedades de EJEMPLO. No publicar así.\n');
     return FIXTURES.map(normalizar).filter(Boolean) as Propiedad[];
   }

@@ -1,7 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "astro",
-  "trailingSlash": true,
   "headers": [
     {
       "source": "/_astro/(.*)",
