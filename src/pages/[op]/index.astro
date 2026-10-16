@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import Listado from '../../components/Listado.astro';
+import { getPropiedades, filtrar, ordenarRecientes, OPERACIONES, type Operacion } from '../../lib/tokko';
+import { operacionesConPaginas, relacionadosDe, h1Listado } from '../../lib/rutas';
+import { breadcrumbJsonLd } from '../../lib/seo';
+
+export async function getStaticPaths() {
+  const props = await getPropiedades();
+  return operacionesConPaginas(props).map((op) => ({ params: { op } }));
+}
+
+const op = Astro.params.op as Operacion;
+const todas = await getPropiedades();
+const items = ordenarRecientes(filtrar(todas, { operacion: op }));
+const h1 = h1Listado(op);
+const migas = [{ name: 'Inicio', href: '/' }, { name: OPERACIONES[op].label, href: `/${op}/` }];
+const intro =
+  op === 'venta'
+    ? 'Casas, dúplex, terrenos y departamentos en venta en Salsipuedes, Río Ceballos, Unquillo y Córdoba. Fotos reales, precio a la vista y documentación verificada.'
+    : 'Casas, departamentos y locales en alquiler en las Sierras Chicas. La oferta en la zona es chica y se alquila rápido: si ves algo que te sirve, escribinos hoy.';
+---
+<Base
+  title={h1}
+  description={`${items.length} ${items.length === 1 ? 'propiedad' : 'propiedades'} ${OPERACIONES[op].enLabel} en Salsipuedes, Río Ceballos y Unquillo. ${intro.split('.')[1]?.trim() ?? ''}`.trim()}
+  activo={op}
+  jsonLd={breadcrumbJsonLd(migas)}
+>
+  <Listado h1={h1} intro={intro} items={items} op={op} migas={migas} relacionados={relacionadosDe(todas, op)} filtrosFijos={{ op: true }} />
+</Base>

@@ -1,0 +1,21 @@
+{
+  "name": "zavalaseppey-web",
+  "version": "1.0.0",
+  "description": "Sitio web de Zavala Seppey Servicios Inmobiliarios",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/poppins": "^5.3.0",
+    "astro": "^7.4.0"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  }
+}

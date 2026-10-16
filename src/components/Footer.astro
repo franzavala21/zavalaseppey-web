@@ -1,0 +1,37 @@
+---
+import { SITE, waLink } from '../config/site';
+import { ZONAS } from '../data/zonas';
+const anio = new Date().getFullYear();
+---
+<footer class="pie" id="contacto-pie">
+  <div class="contenedor pie__grid">
+    <div>
+      <img src="/logo-light.png" alt={SITE.legalName} width="600" height="159" loading="lazy" />
+      <p>Venta, alquiler y administración de propiedades en Salsipuedes y Sierras Chicas desde hace más de 25 años.</p>
+    </div>
+    <div>
+      <h2>Contacto</h2>
+      <p>{SITE.address.street}<br />{SITE.address.locality}, {SITE.address.region}</p>
+      <p><a href={waLink()} style="color:#fff">WhatsApp {SITE.whatsappLabel}</a></p>
+      <p><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+    </div>
+    <div>
+      <h2>Propiedades</h2>
+      {ZONAS.filter((z) => z.slug !== 'cordoba').map((z) => <p><a href={`/venta/${z.slug}/`}>Propiedades en venta en {z.nombre}</a></p>)}
+      <p><a href="/alquiler/">Alquileres</a></p>
+    </div>
+    <div>
+      <h2>Horarios</h2>
+      {SITE.hours.map((h) => <p>{h.label} {h.value}</p>)}
+      <p style="margin-top:18px;display:flex;gap:16px">
+        <a href={SITE.social.instagram} rel="noopener" style="color:#fff">Instagram</a>
+        {SITE.social.facebook && <a href={SITE.social.facebook} rel="noopener" style="color:#fff">Facebook</a>}
+      </p>
+      <p style="margin-top:12px"><a href="/guias/">Guías</a> · <a href="/tasaciones/">Tasaciones</a></p>
+    </div>
+  </div>
+  <div class="contenedor pie__legal">
+    <span>© {anio} {SITE.name}{SITE.matricula ? ` · Matrícula ${SITE.matricula}` : ''}</span>
+    <span>Medidas, fotos y precios son orientativos y pueden cambiar sin aviso.</span>
+  </div>
+</footer>

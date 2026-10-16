@@ -1,0 +1,178 @@
+---
+// Página de listado reutilizable: venta, alquiler, por localidad, por tipo, apto crédito y búsqueda.
+import Migas from './Migas.astro';
+import TarjetaPropiedad from './TarjetaPropiedad.astro';
+import type { Operacion, Propiedad } from '../lib/tokko';
+import { tipoInfo } from '../lib/tokko';
+import { ZONAS } from '../data/zonas';
+import { waLink } from '../config/site';
+
+interface Props {
+  h1: string;
+  intro: string;
+  items: Propiedad[];
+  op?: Operacion;
+  migas: { name: string; href: string }[];
+  bloques?: { titulo: string; texto: string }[];
+  tituloBloques?: string;
+  relacionados?: { href: string; label: string }[];
+  filtrosFijos?: { zona?: boolean; tipo?: boolean; op?: boolean };
+  leerUrl?: boolean;
+}
+const { h1, intro, items, op, migas, bloques = [], tituloBloques = '', relacionados = [], filtrosFijos = {}, leerUrl = false } = Astro.props;
+const tipos = [...new Map(items.map((p) => [p.tipoSlug, tipoInfo(p.tipo)])).values()];
+const zonas = ZONAS.filter((z) => items.some((p) => p.zona === z.slug));
+const hayCredito = items.some((p) => p.aptoCredito);
+---
+<div class="contenedor" style="padding-block:28px 80px">
+  <Migas items={migas} />
+  <h1 style="margin:22px 0 10px;font-weight:700;font-size:clamp(30px,4vw,44px)">{h1}</h1>
+  <p style="max-width:760px;font-size:17px;color:var(--gris-2)">{intro}</p>
+
+  <div class="listado">
+    <aside class="filtros" aria-label="Filtros" data-filtros data-leer-url={leerUrl ? '1' : '0'}>
+      <h2>Filtrar</h2>
+      {!filtrosFijos.op && !op && (
+        <label class="campo">Operación
+          <select data-f="op"><option value="">Todas</option><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select>
+        </label>
+      )}
+      {!filtrosFijos.tipo && tipos.length > 1 && (
+        <label class="campo">Tipo
+          <select data-f="tipo"><option value="">Todos</option>{tipos.map((t) => <option value={t.slug}>{t.plural}</option>)}</select>
+        </label>
+      )}
+      {!filtrosFijos.zona && zonas.length > 1 && (
+        <label class="campo">Localidad
+          <select data-f="zona"><option value="">Todas</option>{zonas.map((z) => <option value={z.slug}>{z.nombre}</option>)}</select>
+        </label>
+      )}
+      <label class="campo">Dormitorios
+        <select data-f="dorm"><option value="">Indistinto</option><option value="1">1 o más</option><option value="2">2 o más</option><option value="3">3 o más</option></select>
+      </label>
+      <fieldset style="border:0;padding:0;margin:0">
+        <legend class="campo" style="margin-bottom:6px">Precio máximo</legend>
+        <div style="display:flex;gap:8px">
+          <label class="campo" style="flex:0 0 96px"><span class="sr-only">Moneda</span>
+            <select data-f="moneda"><option value="USD">USD</option><option value="ARS">$</option></select>
+          </label>
+          <label class="campo" style="flex:1"><span class="sr-only">Hasta</span>
+            <input type="number" inputmode="numeric" min="0" step="1000" placeholder="Hasta" data-f="max" />
+          </label>
+        </div>
+      </fieldset>
+      {hayCredito && (
+        <button type="button" class="toggle" aria-pressed="false" data-f="credito">
+          <span>Solo apto crédito</span><span aria-hidden="true" data-check></span>
+        </button>
+      )}
+    </aside>
+
+    <section class="resultados" aria-label="Resultados">
+      <div class="resultados__barra">
+        <p style="font-weight:600" aria-live="polite"><span data-cuenta>{items.length}</span> {items.length === 1 ? 'propiedad disponible' : 'propiedades disponibles'}</p>
+        <label style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--gris)">Ordenar por
+          <select data-orden style="padding:9px 12px;border:1px solid var(--linea-2);border-radius:10px;font:500 14px var(--fuente-texto);background:#fff">
+            <option value="recientes">Más recientes</option>
+            <option value="menor">Menor precio</option>
+            <option value="mayor">Mayor precio</option>
+          </select>
+        </label>
+      </div>
+      {items.length > 0 ? (
+        <div class="grilla grilla--chica" data-grilla>
+          {items.map((p, i) => <TarjetaPropiedad p={p} op={op} prioridad={i < 2} />)}
+        </div>
+      ) : null}
+      <div class="vacio" data-vacio hidden={items.length > 0}>
+        <p style="font:600 18px var(--fuente-titulos);margin-bottom:8px">No hay propiedades con esos filtros ahora mismo.</p>
+        <p style="margin-bottom:18px">Contanos qué buscás y te avisamos cuando entre algo así: muchas propiedades se venden antes de publicarse.</p>
+        <a class="btn btn--wa" href={waLink(`Hola! Estoy buscando: ${h1}`)} rel="noopener">Avisame por WhatsApp</a>
+      </div>
+    </section>
+  </div>
+
+  {(bloques.length > 0 || relacionados.length > 0) && (
+    <section class="texto-seo">
+      {bloques.length > 0 && (
+        <div class="texto-seo__main">
+          {tituloBloques && <h2>{tituloBloques}</h2>}
+          {bloques.map((b, i) => (i === 0 && !tituloBloques ? <><h2>{b.titulo}</h2><p>{b.texto}</p></> : <><h3>{b.titulo}</h3><p>{b.texto}</p></>))}
+        </div>
+      )}
+      {relacionados.length > 0 && (
+        <nav class="texto-seo__links" aria-label="Búsquedas relacionadas">
+          <h2>Búsquedas relacionadas</h2>
+          {relacionados.map((r) => <a href={r.href}>{r.label}</a>)}
+        </nav>
+      )}
+    </section>
+  )}
+</div>
+
+<script>
+  const panel = document.querySelector<HTMLElement>('[data-filtros]');
+  const grilla = document.querySelector<HTMLElement>('[data-grilla]');
+  if (panel && grilla) {
+    const tarjetas = [...grilla.querySelectorAll<HTMLElement>('[data-propiedad]')];
+    const cuenta = document.querySelector('[data-cuenta]');
+    const vacio = document.querySelector<HTMLElement>('[data-vacio]');
+    const orden = document.querySelector<HTMLSelectElement>('[data-orden]');
+    const credito = panel.querySelector<HTMLButtonElement>('[data-f="credito"]');
+    const campo = (n: string) => panel.querySelector<HTMLInputElement | HTMLSelectElement>(`[data-f="${n}"]`);
+
+    if (panel.dataset.leerUrl === '1') {
+      const q = new URLSearchParams(location.search);
+      for (const n of ['op', 'tipo', 'zona', 'dorm']) {
+        const c = campo(n), v = q.get(n);
+        if (c && v) c.value = v;
+      }
+      if (q.get('credito') === '1' && credito) credito.setAttribute('aria-pressed', 'true');
+    }
+
+    const aplicar = () => {
+      const op = campo('op')?.value || '';
+      const tipo = campo('tipo')?.value || '';
+      const zona = campo('zona')?.value || '';
+      const dorm = Number(campo('dorm')?.value || 0);
+      const moneda = campo('moneda')?.value || 'USD';
+      const max = Number(campo('max')?.value || 0);
+      const soloCredito = credito?.getAttribute('aria-pressed') === 'true';
+      const check = credito?.querySelector('[data-check]');
+      if (check) check.textContent = soloCredito ? '✓' : '';
+      let n = 0;
+      for (const t of tarjetas) {
+        const d = t.dataset;
+        const ok =
+          (!op || (d.op || '').split(' ').includes(op)) &&
+          (!tipo || d.tipo === tipo) &&
+          (!zona || d.zona === zona) &&
+          (!dorm || Number(d.dorm) >= dorm) &&
+          (!max || (d.moneda === moneda && Number(d.precio) > 0 && Number(d.precio) <= max)) &&
+          (!soloCredito || d.credito === '1');
+        t.hidden = !ok;
+        if (ok) n++;
+      }
+      if (cuenta) cuenta.textContent = String(n);
+      if (vacio) vacio.hidden = n > 0;
+    };
+
+    const ordenar = () => {
+      const modo = orden?.value || 'recientes';
+      const val = (t: HTMLElement) => Number(t.dataset.precio) || (modo === 'menor' ? Infinity : -Infinity);
+      const lista = [...tarjetas].sort((a, b) =>
+        modo === 'menor' ? val(a) - val(b) : modo === 'mayor' ? val(b) - val(a) : tarjetas.indexOf(a) - tarjetas.indexOf(b)
+      );
+      lista.forEach((t) => grilla.appendChild(t));
+    };
+
+    panel.addEventListener('change', aplicar);
+    panel.addEventListener('input', aplicar);
+    credito?.addEventListener('click', () => {
+      credito.setAttribute('aria-pressed', String(credito.getAttribute('aria-pressed') !== 'true'));
+      aplicar();
+    });
+    orden?.addEventListener('change', ordenar);
+    aplicar();
+  }
+</script>

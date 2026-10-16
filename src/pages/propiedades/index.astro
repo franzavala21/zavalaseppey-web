@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import Listado from '../../components/Listado.astro';
+import { getPropiedades, ordenarRecientes } from '../../lib/tokko';
+import { breadcrumbJsonLd } from '../../lib/seo';
+
+const items = ordenarRecientes(await getPropiedades());
+const migas = [{ name: 'Inicio', href: '/' }, { name: 'Propiedades', href: '/propiedades/' }];
+const h1 = 'Propiedades en venta y alquiler en Sierras Chicas';
+---
+<Base
+  title={h1}
+  description={`Todas nuestras propiedades: ${items.length} casas, terrenos, departamentos y locales en venta y alquiler en Salsipuedes, Río Ceballos y Unquillo.`}
+  jsonLd={breadcrumbJsonLd(migas)}
+>
+  <Listado
+    h1={h1}
+    intro="Toda nuestra cartera en un solo lugar. Usá los filtros para encontrar lo que buscás, o escribinos y te avisamos cuando entre algo a tu medida."
+    items={items}
+    migas={migas}
+    leerUrl
+  />
+</Base>

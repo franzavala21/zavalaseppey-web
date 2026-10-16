@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import Migas from '../components/Migas.astro';
+import Icono from '../components/Icono.astro';
+import { SITE, waLink } from '../config/site';
+import { breadcrumbJsonLd } from '../lib/seo';
+
+const migas = [{ name: 'Inicio', href: '/' }, { name: 'Contacto', href: '/contacto/' }];
+const direccion = `${SITE.address.street}, ${SITE.address.locality}, ${SITE.address.region}`;
+const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
+---
+<Base
+  title="Contacto"
+  description={`Escribinos por WhatsApp al ${SITE.whatsappLabel} o visitanos en ${direccion}. ${SITE.hours.map((h) => `${h.label} ${h.value}`).join(', ')}.`}
+  activo="contacto"
+  jsonLd={breadcrumbJsonLd(migas)}
+>
+  <div class="contenedor" style="padding-block:28px 96px">
+    <Migas items={migas} />
+    <h1 style="margin:22px 0 32px;font-weight:700;font-size:clamp(30px,4vw,44px)">Contacto</h1>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+      <div style="flex:1 1 360px;display:flex;flex-direction:column;gap:22px">
+        <a class="btn btn--wa btn--cuadrado" style="min-height:56px;align-self:flex-start" href={waLink()} rel="noopener"><Icono nombre="wa" tam={20} />WhatsApp {SITE.whatsappLabel}</a>
+        <div><h2 style="font-size:18px;margin-bottom:6px">Oficina</h2><p>{SITE.address.street}<br />{SITE.address.locality}, {SITE.address.region}</p><p style="margin-top:6px"><a class="link-fuerte" href={mapsUrl} rel="noopener">Cómo llegar</a></p></div>
+        <div><h2 style="font-size:18px;margin-bottom:6px">Horarios</h2>{SITE.hours.map((h) => <p>{h.label}: {h.value}</p>)}</div>
+        <div><h2 style="font-size:18px;margin-bottom:6px">Email</h2><p><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p></div>
+      </div>
+      <form class="form-blanca" style="flex:1 1 420px;border:1px solid var(--linea)" aria-label="Escribinos" data-wa="Hola! Les escribo desde la web." data-numero={SITE.whatsapp}>
+        <h2 style="font-size:22px">Escribinos</h2>
+        <label class="campo">Nombre<input type="text" name="Nombre" autocomplete="name" required /></label>
+        <label class="campo">Busco
+          <select name="Busco"><option>Comprar</option><option>Alquilar</option><option>Vender o tasar</option><option>Administración de mi alquiler</option><option>Otra consulta</option></select>
+        </label>
+        <label class="campo">Mensaje<textarea name="Mensaje" rows="4"></textarea></label>
+        <button class="btn btn--tinta btn--cuadrado" type="submit">Enviar por WhatsApp</button>
+      </form>
+    </div>
+  </div>
+</Base>

@@ -1,0 +1,197 @@
+---
+import Base from '../../layouts/Base.astro';
+import Migas from '../../components/Migas.astro';
+import TarjetaPropiedad from '../../components/TarjetaPropiedad.astro';
+import Icono from '../../components/Icono.astro';
+import { SITE, waLink } from '../../config/site';
+import { getPropiedades, precioDe, similares, OPERACIONES, type Propiedad } from '../../lib/tokko';
+import { urlListado, rutasTipo } from '../../lib/rutas';
+import { breadcrumbJsonLd, propiedadJsonLd, abs } from '../../lib/seo';
+import { formatoNumero, parrafos, resumen } from '../../lib/text';
+import { zonaPorSlug } from '../../data/zonas';
+
+export async function getStaticPaths() {
+  const props = await getPropiedades();
+  return props.map((p) => ({ params: { slug: p.slug }, props: { p } }));
+}
+
+const { p } = Astro.props as { p: Propiedad };
+const todas = await getPropiedades();
+const op = p.operaciones[0];
+const precio = precioDe(p, op);
+const otrosPrecios = p.precios.filter((x) => x !== precio);
+const zona = p.zona ? zonaPorSlug(p.zona) : undefined;
+const existeTipo = zona && rutasTipo(todas).some((r) => r.op === op && r.zona === zona.slug && r.tipo === p.tipoSlug);
+
+const migas = [
+  { name: 'Inicio', href: '/' },
+  { name: OPERACIONES[op].label, href: `/${op}/` },
+  ...(zona ? [{ name: zona.nombre, href: urlListado(op, zona.slug) }] : []),
+  ...(zona && existeTipo ? [{ name: p.tipo, href: urlListado(op, zona.slug, p.tipoSlug) }] : []),
+  { name: p.titulo, href: `/propiedad/${p.slug}/` },
+];
+
+const datos = [
+  p.dormitorios && { k: 'Dormitorios', v: p.dormitorios },
+  p.banos && { k: 'Baños', v: p.toilettes ? `${p.banos} + toilette` : p.banos },
+  !p.banos && p.toilettes && { k: 'Toilettes', v: p.toilettes },
+  p.supCubierta && { k: 'Sup. cubierta', v: `${formatoNumero(p.supCubierta)} m²` },
+  p.supTerreno && { k: 'Terreno', v: `${formatoNumero(p.supTerreno)} m²` },
+  !p.supCubierta && !p.supTerreno && p.supTotal && { k: 'Superficie', v: `${formatoNumero(p.supTotal)} m²` },
+  p.cocheras && { k: 'Cocheras', v: p.cocheras },
+  p.antiguedad !== null && { k: 'Antigüedad', v: p.antiguedad === 0 ? 'A estrenar' : `${p.antiguedad} años` },
+  p.aptoCredito && { k: 'Documentación', v: 'Apto crédito' },
+].filter(Boolean) as { k: string; v: string | number }[];
+
+const mensaje = `Hola! Me interesa la propiedad "${p.titulo}" (código ${p.codigo}). ¿Cuándo se puede visitar?`;
+const url = abs(`/propiedad/${p.slug}/`);
+const desc = resumen(`${precio.valor ? precio.texto + '. ' : ''}${p.titulo}. ${p.descripcion}`, 158);
+// Mapa: zona aproximada (coordenadas redondeadas), nunca la ubicación exacta
+const mapa = p.lat && p.lng
+  ? (() => {
+      const la = Math.round(p.lat * 100) / 100, lo = Math.round(p.lng * 100) / 100, d = 0.012;
+      return `https://www.openstreetmap.org/export/embed.html?bbox=${lo - d}%2C${la - d}%2C${lo + d}%2C${la + d}&layer=mapnik`;
+    })()
+  : null;
+const parecidas = similares(todas, p);
+const fotos = p.fotos;
+---
+<Base
+  title={p.titulo}
+  description={desc}
+  image={fotos[0]?.url}
+  activo={op}
+  jsonLd={[propiedadJsonLd(p, url), breadcrumbJsonLd(migas)]}
+>
+  <div class="contenedor" style="padding-block:24px 80px">
+    <Migas items={migas} />
+
+    {fotos.length > 0 ? (
+      <div class="galeria" data-galeria>
+        {fotos.slice(0, 5).map((f, i) => (
+          <button type="button" data-foto={i} aria-label={`Ampliar foto ${i + 1} de ${fotos.length}`}>
+            <img src={i === 0 ? f.url : f.thumb} alt={f.alt} width="800" height="600" loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
+            {i === 4 && fotos.length > 5 && <span class="galeria__mas">Ver las {fotos.length} fotos</span>}
+          </button>
+        ))}
+      </div>
+    ) : (
+      <div class="galeria galeria--vacia"><div>Fotos próximamente</div></div>
+    )}
+
+    <div class="ficha">
+      <article class="ficha__main">
+        <div class="ficha__sellos">
+          {p.operaciones.map((o) => <span class:list={['op', { 'op--alquiler': o !== 'venta' }]}>{OPERACIONES[o].label}</span>)}
+          {p.aptoCredito && <span>Apto crédito</span>}
+        </div>
+        <h1>{p.titulo}</h1>
+        <p class="ficha__lugar">{p.ubicacion}</p>
+        <p class="ficha__precio">
+          {precio.texto}
+          {otrosPrecios.map((o) => <small>{OPERACIONES[o.operacion].label}: {o.texto}</small>)}
+          {p.expensas && <small>Expensas: $ {formatoNumero(p.expensas)}</small>}
+        </p>
+
+        {datos.length > 0 && (
+          <dl class="datos">
+            {datos.map((d) => <div><dt>{d.k}</dt><dd>{d.v}</dd></div>)}
+          </dl>
+        )}
+
+        {p.descripcion && (
+          <section class="ficha__bloque ficha__desc">
+            <h2>Descripción</h2>
+            <Fragment set:html={parrafos(p.descripcion)} />
+          </section>
+        )}
+
+        {p.etiquetas.length > 0 && (
+          <section class="ficha__bloque">
+            <h2>Características</h2>
+            <ul class="lista-extras">{p.etiquetas.map((t) => <li>{t}</li>)}</ul>
+          </section>
+        )}
+
+        {p.videos[0] && (
+          <section class="ficha__bloque">
+            <h2>Recorrido en video</h2>
+            <div class="video-wrap">
+              <iframe src={p.videos[0]} title={`Video de ${p.titulo}`} loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            </div>
+          </section>
+        )}
+
+        <section class="ficha__bloque">
+          <h2>Ubicación</h2>
+          {mapa && <iframe class="mapa" src={mapa} title={`Mapa de la zona: ${p.ubicacion}`} loading="lazy"></iframe>}
+          <p class="nota" style="margin-top:10px">Zona aproximada en {p.ubicacion}. La dirección exacta te la pasamos al coordinar la visita.</p>
+        </section>
+
+        <p class="nota" style="margin-top:28px">Código de referencia: {p.codigo}</p>
+      </article>
+
+      <aside class="contacto-lateral" aria-label="Consultar por esta propiedad">
+        <h2>¿Te interesa? Coordinemos la visita</h2>
+        <a class="btn btn--wa btn--cuadrado" style="min-height:54px" href={waLink(mensaje)} rel="noopener"><Icono nombre="wa" tam={20} />Consultar por WhatsApp</a>
+        <p class="nota" style="text-align:center">o dejanos tus datos y te escribimos</p>
+        <form style="display:flex;flex-direction:column;gap:14px" data-wa={mensaje} data-numero={SITE.whatsapp}>
+          <label class="campo">Nombre<input type="text" name="Nombre" autocomplete="name" required /></label>
+          <label class="campo">Teléfono<input type="tel" name="Teléfono" autocomplete="tel" /></label>
+          <label class="campo">Mensaje<textarea name="Mensaje" rows="3"></textarea></label>
+          <button class="btn btn--tinta btn--cuadrado" type="submit">Enviar consulta</button>
+        </form>
+        {p.aptoCredito && <p class="nota nota--borde">La evaluación del crédito y el cálculo de la cuota los hace el banco. Nosotros te pasamos la documentación de la propiedad.</p>}
+      </aside>
+    </div>
+
+    {parecidas.length > 0 && (
+      <section style="margin-top:72px">
+        <h2 class="titulo-seccion" style="margin-bottom:22px">También te pueden interesar</h2>
+        <div class="grilla grilla--chica">{parecidas.map((x) => <TarjetaPropiedad p={x} op={op} />)}</div>
+      </section>
+    )}
+  </div>
+
+  {fotos.length > 0 && (
+    <div class="visor" data-visor data-abierto="false" role="dialog" aria-modal="true" aria-label="Fotos de la propiedad">
+      <img alt="" data-visor-img />
+      <button class="visor__cerrar" type="button" aria-label="Cerrar" data-visor-cerrar>×</button>
+      <button class="visor__ant" type="button" aria-label="Foto anterior" data-visor-ant>‹</button>
+      <button class="visor__sig" type="button" aria-label="Foto siguiente" data-visor-sig>›</button>
+      <p class="visor__cont" data-visor-cont></p>
+    </div>
+    <script type="application/json" data-fotos set:html={JSON.stringify(fotos.map((f) => ({ url: f.url, alt: f.alt })))} />
+  )}
+</Base>
+
+<script>
+  const visor = document.querySelector<HTMLElement>('[data-visor]');
+  const datos = document.querySelector('[data-fotos]');
+  if (visor && datos) {
+    const fotos: { url: string; alt: string }[] = JSON.parse(datos.textContent || '[]');
+    const img = visor.querySelector<HTMLImageElement>('[data-visor-img]')!;
+    const cont = visor.querySelector('[data-visor-cont]')!;
+    let i = 0;
+    let origen: HTMLElement | null = null;
+    const mostrar = (n: number) => {
+      i = (n + fotos.length) % fotos.length;
+      img.src = fotos[i].url;
+      img.alt = fotos[i].alt;
+      cont.textContent = `${i + 1} / ${fotos.length}`;
+    };
+    const abrir = (n: number, el: HTMLElement) => { origen = el; mostrar(n); visor.dataset.abierto = 'true'; visor.querySelector<HTMLButtonElement>('[data-visor-cerrar]')?.focus(); };
+    const cerrar = () => { visor.dataset.abierto = 'false'; origen?.focus(); };
+    document.querySelectorAll<HTMLButtonElement>('[data-foto]').forEach((b) => b.addEventListener('click', () => abrir(Number(b.dataset.foto), b)));
+    visor.querySelector('[data-visor-cerrar]')?.addEventListener('click', cerrar);
+    visor.querySelector('[data-visor-ant]')?.addEventListener('click', () => mostrar(i - 1));
+    visor.querySelector('[data-visor-sig]')?.addEventListener('click', () => mostrar(i + 1));
+    visor.addEventListener('click', (e) => { if (e.target === visor) cerrar(); });
+    document.addEventListener('keydown', (e) => {
+      if (visor.dataset.abierto !== 'true') return;
+      if (e.key === 'Escape') cerrar();
+      if (e.key === 'ArrowLeft') mostrar(i - 1);
+      if (e.key === 'ArrowRight') mostrar(i + 1);
+    });
+  }
+</script>

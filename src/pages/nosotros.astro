@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import Migas from '../components/Migas.astro';
+import { SITE } from '../config/site';
+import { breadcrumbJsonLd } from '../lib/seo';
+
+const migas = [{ name: 'Inicio', href: '/' }, { name: 'Nosotros', href: '/nosotros/' }];
+---
+<Base
+  title="Nosotros: inmobiliaria en Salsipuedes desde hace más de 25 años"
+  description="Zavala Seppey es una inmobiliaria de Salsipuedes con más de 25 años en las Sierras Chicas. Venta, alquiler, tasaciones y administración de alquileres."
+  activo="nosotros"
+  jsonLd={breadcrumbJsonLd(migas)}
+>
+  <div class="contenedor" style="padding-block:28px 96px">
+    <Migas items={migas} />
+    <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;margin-top:8px">
+      <div class="prosa" style="flex:1 1 440px">
+        <h1>Una inmobiliaria de la sierra, para la sierra</h1>
+        <p>Desde hace más de 25 años trabajamos en Salsipuedes y las Sierras Chicas. Conocemos qué calles se inundan, qué lotes tienen escritura y qué barrio le conviene a cada familia.</p>
+        <p>Además de vender y alquilar, administramos alquileres de punta a punta: cobranza, servicios, aumentos por índice y liquidación mensual al propietario.</p>
+        <p>Estamos en {SITE.address.street}, {SITE.address.locality}.</p>
+      </div>
+      <div class="stats" style="flex:1 1 440px">
+        {SITE.stats.map((s) => <div class="stat"><b>{s.value}</b><span>{s.label}</span></div>)}
+      </div>
+    </div>
+  </div>
+</Base>

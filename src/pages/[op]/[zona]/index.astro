@@ -1,0 +1,45 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Listado from '../../../components/Listado.astro';
+import { getPropiedades, filtrar, ordenarRecientes, OPERACIONES, type Operacion } from '../../../lib/tokko';
+import { rutasZona, relacionadosDe, h1Listado } from '../../../lib/rutas';
+import { zonaPorSlug } from '../../../data/zonas';
+import { breadcrumbJsonLd } from '../../../lib/seo';
+
+export async function getStaticPaths() {
+  const props = await getPropiedades();
+  return rutasZona(props).map((r) => ({ params: { op: r.op, zona: r.zona } }));
+}
+
+const op = Astro.params.op as Operacion;
+const zona = zonaPorSlug(Astro.params.zona!)!;
+const todas = await getPropiedades();
+const items = ordenarRecientes(filtrar(todas, { operacion: op, zona: zona.slug }));
+const h1 = h1Listado(op, zona.slug);
+const migas = [
+  { name: 'Inicio', href: '/' },
+  { name: OPERACIONES[op].label, href: `/${op}/` },
+  { name: zona.nombre, href: `/${op}/${zona.slug}/` },
+];
+const intro =
+  op === 'venta'
+    ? zona.intro
+    : `Propiedades en alquiler en ${zona.nombre}. La oferta es chica y se alquila rápido: si ves algo que te sirve, escribinos hoy. Requisito habitual: tres recibos de sueldo o garantía propietaria.`;
+---
+<Base
+  title={h1}
+  description={`${h1}: ${items.length ? `${items.length} disponibles hoy` : 'consultá disponibilidad'}, con fotos y precio. ${zona.resumen}`}
+  activo={op}
+  jsonLd={breadcrumbJsonLd(migas)}
+>
+  <Listado
+    h1={h1}
+    intro={intro}
+    items={items}
+    op={op}
+    migas={migas}
+    bloques={op === 'venta' ? zona.bloques : []}
+    relacionados={relacionadosDe(todas, op, zona.slug)}
+    filtrosFijos={{ op: true, zona: true }}
+  />
+</Base>

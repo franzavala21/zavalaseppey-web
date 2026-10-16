@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import Migas from '../../components/Migas.astro';
+import { GUIAS_PUBLICADAS } from '../../data/contenido';
+import { breadcrumbJsonLd } from '../../lib/seo';
+
+const migas = [{ name: 'Inicio', href: '/' }, { name: 'Guías', href: '/guias/' }];
+---
+<Base
+  title="Guías para comprar y alquilar en Sierras Chicas"
+  description="Guías prácticas para comprar con crédito hipotecario, conocer los precios de cada localidad y mudarse a Salsipuedes y las Sierras Chicas."
+  jsonLd={breadcrumbJsonLd(migas)}
+>
+  <section class="contenedor" style="padding-block:28px 96px">
+    <Migas items={migas} />
+    <h1 style="margin:22px 0 10px;font-weight:700;font-size:clamp(30px,4vw,44px)">Guías para comprar y alquilar en las sierras</h1>
+    <p class="bajada" style="margin-bottom:36px;font-size:17px">Lo que nos preguntan todas las semanas, respondido con datos de la zona.</p>
+    <div class="grilla">
+      {GUIAS_PUBLICADAS.map((g) => (
+        <a class="guia-card" href={`/guias/${g.slug}/`}>
+          <span class="guia-card__tag">{g.tag}</span>
+          <h2 style="font-weight:600;font-size:20px;line-height:1.3">{g.titulo}</h2>
+          <p>{g.bajada}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>

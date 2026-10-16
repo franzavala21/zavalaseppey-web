@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Página no encontrada" description="La página que buscás no existe o la propiedad ya no está disponible." noindex>
+  <section class="contenedor" style="padding-block:96px;text-align:center">
+    <h1 style="font-size:clamp(30px,4vw,44px)">Esta página no existe</h1>
+    <p style="margin:14px auto 28px;max-width:520px;color:var(--gris-2)">Puede que la propiedad ya se haya vendido o alquilado. Mirá lo que tenemos disponible hoy:</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+      <a class="btn btn--naranja" href="/venta/">Propiedades en venta</a>
+      <a class="btn btn--borde" href="/alquiler/">Alquileres</a>
+    </div>
+  </section>
+</Base>

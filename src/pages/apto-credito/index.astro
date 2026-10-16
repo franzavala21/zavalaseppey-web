@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import Listado from '../../components/Listado.astro';
+import { getPropiedades, ordenarRecientes, filtrar } from '../../lib/tokko';
+import { breadcrumbJsonLd } from '../../lib/seo';
+
+const items = ordenarRecientes(filtrar(await getPropiedades(), { operacion: 'venta' }).filter((p) => p.aptoCredito));
+const migas = [{ name: 'Inicio', href: '/' }, { name: 'Venta', href: '/venta/' }, { name: 'Apto crédito', href: '/apto-credito/' }];
+const h1 = 'Propiedades apto crédito hipotecario en Sierras Chicas';
+---
+<Base
+  title={h1}
+  description="Casas, dúplex y departamentos con escritura y planos al día, aptos para crédito hipotecario UVA, en Salsipuedes, Río Ceballos, Unquillo y Córdoba."
+  jsonLd={breadcrumbJsonLd(migas)}
+>
+  <Listado
+    h1={h1}
+    intro="Todas tienen escritura y planos aprobados al día, que es lo que necesita un banco para tomar la propiedad. La evaluación crediticia y la cuota las define el banco; nosotros te entregamos la documentación."
+    items={items}
+    op="venta"
+    migas={migas}
+    filtrosFijos={{ op: true }}
+    bloques={[
+      { titulo: 'Qué necesita una propiedad para ser apta crédito', texto: 'Escritura a nombre del vendedor, planos aprobados que coincidan con lo construido y estar libre de deudas e inhibiciones. Antes de publicar una propiedad con este sello, revisamos esa documentación.' },
+      { titulo: 'Cómo seguir', texto: 'Elegí la propiedad, pedí la precalificación en tu banco y escribinos: te pasamos la documentación para que la presentes y coordinamos la tasación del banco.' },
+    ]}
+    relacionados={[{ href: '/guias/comprar-casa-con-credito-hipotecario-en-salsipuedes/', label: 'Guía: comprar con crédito UVA en Salsipuedes' }, { href: '/venta/salsipuedes/', label: 'Propiedades en venta en Salsipuedes' }]}
+  />
+</Base>

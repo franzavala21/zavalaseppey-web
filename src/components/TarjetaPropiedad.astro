@@ -1,0 +1,48 @@
+---
+import type { Operacion, Propiedad } from '../lib/tokko';
+import { precioDe, OPERACIONES } from '../lib/tokko';
+import { formatoNumero } from '../lib/text';
+
+interface Props { p: Propiedad; op?: Operacion; nivel?: 'h2' | 'h3'; prioridad?: boolean }
+const { p, op, nivel = 'h3', prioridad = false } = Astro.props;
+const operacion = op && p.operaciones.includes(op) ? op : p.operaciones[0];
+const precio = precioDe(p, operacion);
+const Titulo = nivel;
+
+const extra = p.aptoCredito ? 'Apto crédito' : p.etiquetas.find((t) => /permuta|financ|estrenar|escritura|barrio cerrado/i.test(t)) ?? '';
+const datos = [
+  p.dormitorios ? `${p.dormitorios} dorm.` : null,
+  p.banos ? `${p.banos} ${p.banos === 1 ? 'baño' : 'baños'}` : null,
+  p.supCubierta ? `${formatoNumero(p.supCubierta)} m² cub.` : null,
+  p.supTerreno ? `${formatoNumero(p.supTerreno)} m² terreno` : null,
+  p.cocheras ? 'Cochera' : null,
+].filter(Boolean).slice(0, 3);
+const href = `/propiedad/${p.slug}/`;
+const foto = p.fotos[0];
+---
+<article
+  class="tarjeta"
+  data-propiedad
+  data-op={p.operaciones.join(' ')}
+  data-tipo={p.tipoSlug}
+  data-zona={p.zona ?? ''}
+  data-dorm={p.dormitorios ?? 0}
+  data-precio={precio?.valor ?? 0}
+  data-moneda={precio?.moneda ?? ''}
+  data-credito={p.aptoCredito ? '1' : '0'}
+  data-id={p.id}
+>
+  <a class="tarjeta__foto" href={href} tabindex="-1" aria-hidden="true">
+    {foto
+      ? <img src={foto.thumb} alt="" width="640" height="480" loading={prioridad ? 'eager' : 'lazy'} decoding="async" />
+      : <span class="tarjeta__sinfoto">Fotos próximamente</span>}
+    <span class:list={['sello', 'sello--op', { 'sello--alquiler': operacion !== 'venta' }]}>{OPERACIONES[operacion].label}</span>
+    {extra && <span class="sello sello--extra">{extra}</span>}
+  </a>
+  <div class="tarjeta__cuerpo">
+    <p class="tarjeta__precio">{precio?.texto}</p>
+    <Titulo class="tarjeta__titulo"><a href={href}>{p.titulo}</a></Titulo>
+    <p class="tarjeta__lugar">{p.ubicacion}</p>
+    {datos.length > 0 && <div class="tarjeta__datos">{datos.map((d) => <span>{d}</span>)}</div>}
+  </div>
+</article>

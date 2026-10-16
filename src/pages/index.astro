@@ -1,0 +1,226 @@
+---
+import Base from '../layouts/Base.astro';
+import TarjetaPropiedad from '../components/TarjetaPropiedad.astro';
+import Icono from '../components/Icono.astro';
+import { SITE, REVIEWS, waLink } from '../config/site';
+import { ZONAS } from '../data/zonas';
+import { FAQS, GUIAS_PUBLICADAS as GUIAS } from '../data/contenido';
+import { getPropiedades, ordenarRecientes, filtrar, tipoInfo } from '../lib/tokko';
+import { faqJsonLd } from '../lib/seo';
+
+const todas = await getPropiedades();
+const destacadas = ordenarRecientes(todas).slice(0, 6);
+const tiposDisponibles = [...new Map(todas.map((p) => [p.tipoSlug, tipoInfo(p.tipo)])).values()];
+const cuenta = (zona: string) => filtrar(todas, { zona }).length;
+
+const masBuscado = [
+  { href: '/venta/salsipuedes/', label: 'Propiedades en venta en Salsipuedes' },
+  { href: '/apto-credito/', label: 'Propiedades apto crédito' },
+  { href: '/alquiler/', label: 'Alquileres' },
+  { href: '/venta/rio-ceballos/', label: 'Río Ceballos' },
+  { href: '/venta/unquillo/', label: 'Unquillo' },
+];
+---
+<Base
+  title="Inmobiliaria en Salsipuedes y Sierras Chicas | Zavala Seppey"
+  tituloCompleto
+  description={SITE.description}
+  sobreHero
+  jsonLd={faqJsonLd(FAQS)}
+>
+  <section class="hero">
+    {SITE.heroPoster && <img class="hero__media" src={SITE.heroPoster} alt="" fetchpriority="high" />}
+    {SITE.heroVideo && (
+      <video class="hero__media hero__video" autoplay muted loop playsinline preload="metadata" poster={SITE.heroPoster || undefined} aria-hidden="true">
+        <source src={SITE.heroVideo} type="video/mp4" />
+      </video>
+    )}
+    <div class="hero__velo"></div>
+    <div class="contenedor hero__cont">
+      <p class="hero__kicker">Más de 25 años en Sierras Chicas</p>
+      <h1>Inmobiliaria en Salsipuedes y Sierras Chicas</h1>
+      <p class="hero__bajada">Casas, terrenos y alquileres en Salsipuedes, Río Ceballos y Unquillo. Vendemos, alquilamos y administramos con la gente que conoce cada barrio.</p>
+
+      <form class="buscador" role="search" aria-label="Buscar propiedades" action="/propiedades/" method="get" data-buscador>
+        <input type="hidden" name="op" value="venta" />
+        <div class="buscador__tabs">
+          <button type="button" class="buscador__tab" aria-pressed="true" data-op="venta">Comprar</button>
+          <button type="button" class="buscador__tab" aria-pressed="false" data-op="alquiler">Alquilar</button>
+        </div>
+        <div class="buscador__campos">
+          <label class="buscador__campo">Tipo
+            <select name="tipo">
+              <option value="">Todos</option>
+              {tiposDisponibles.map((t) => <option value={t.slug}>{t.plural}</option>)}
+            </select>
+          </label>
+          <label class="buscador__campo">Localidad
+            <select name="zona">
+              <option value="">Todas</option>
+              {ZONAS.map((z) => <option value={z.slug}>{z.nombre}</option>)}
+            </select>
+          </label>
+          <label class="buscador__campo">Dormitorios
+            <select name="dorm">
+              <option value="">Indistinto</option>
+              <option value="1">1 o más</option>
+              <option value="2">2 o más</option>
+              <option value="3">3 o más</option>
+            </select>
+          </label>
+          <button class="btn btn--naranja btn--cuadrado" type="submit"><Icono nombre="buscar" />Buscar</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <div class="seccion--blanca" style="border-top:0">
+    <nav class="contenedor chips" aria-label="Lo más buscado">
+      <span style="font-size:14px;color:var(--gris);margin-right:6px">Lo más buscado:</span>
+      {masBuscado.map((c) => <a class="chip" href={c.href}>{c.label}</a>)}
+    </nav>
+  </div>
+
+  <section class="contenedor seccion" style="padding-bottom:40px">
+    <div class="cabecera-seccion">
+      <div>
+        <h2 class="titulo-seccion">Propiedades destacadas</h2>
+        <p class="bajada">Nuestra cartera actualizada todos los días.</p>
+      </div>
+      <a class="link-fuerte" href="/propiedades/">Ver todas las propiedades</a>
+    </div>
+    <div class="grilla">
+      {destacadas.map((p, i) => <TarjetaPropiedad p={p} prioridad={i < 3} />)}
+    </div>
+  </section>
+
+  <section class="contenedor" style="padding-block:40px 80px">
+    <div class="banda-wa">
+      <div style="flex:1 1 320px">
+        <h2 style="font-weight:700;font-size:30px;line-height:1.2">Hablá directo con quien te puede ayudar</h2>
+        <p style="margin-top:10px;color:#C9C6C1">Cada botón abre WhatsApp con un mensaje listo, así sabemos qué necesitás antes de responder.</p>
+      </div>
+      <div class="banda-wa__btns">
+        <a class="banda-wa__btn" href={waLink('Hola! Quiero comprar una propiedad.')} rel="noopener">Quiero comprar<span aria-hidden="true">→</span></a>
+        <a class="banda-wa__btn" href={waLink('Hola! Busco alquilar.')} rel="noopener">Quiero alquilar<span aria-hidden="true">→</span></a>
+        <a class="banda-wa__btn banda-wa__btn--naranja" href={waLink('Hola! Quiero tasar mi propiedad.')} rel="noopener">Quiero vender o tasar<span aria-hidden="true">→</span></a>
+        <a class="banda-wa__btn" href={waLink('Hola! Soy inquilino/propietario y tengo una consulta.')} rel="noopener">Soy inquilino o propietario<span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion seccion--blanca">
+    <div class="contenedor">
+      <h2 class="titulo-seccion">Propiedades por localidad</h2>
+      <p class="bajada" style="margin-bottom:32px">Cada zona tiene su propio mercado. Te contamos cómo es vivir en cada una, cuánto cuesta y qué tenemos disponible hoy.</p>
+      <div class="grilla grilla--chica">
+        {ZONAS.map((z) => (
+          <a class="zona-card" href={`/venta/${z.slug}/`}>
+            <div class="zona-card__img"></div>
+            <div class="zona-card__txt">
+              <h3>{z.nombre}</h3>
+              <p>{z.resumen}</p>
+              <p class="mas">{cuenta(z.slug) > 0 ? `Ver ${cuenta(z.slug)} ${cuenta(z.slug) === 1 ? 'propiedad' : 'propiedades'} →` : 'Ver la zona →'}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="tasar" id="tasaciones">
+    <div class="contenedor seccion tasar__grid">
+      <div>
+        <p class="hero__kicker" style="color:#FFE2D6">Para propietarios</p>
+        <h2>¿Cuánto vale hoy tu propiedad?</h2>
+        <p class="tasar__txt">Tasamos con datos reales de venta en Salsipuedes, Río Ceballos y Unquillo, no con el precio del aviso de al lado. Te respondemos en el día.</p>
+      </div>
+      <form class="form-blanca" aria-label="Pedir tasación" data-wa="Hola! Quiero pedir una tasación." data-numero={SITE.whatsapp}>
+        <label class="campo">Nombre<input type="text" name="Nombre" autocomplete="name" required /></label>
+        <label class="campo">Dirección o barrio de la propiedad<input type="text" name="Propiedad" /></label>
+        <div class="fila-campos">
+          <label class="campo">Localidad
+            <select name="Localidad"><option>Salsipuedes</option><option>Río Ceballos</option><option>Unquillo</option><option>Otra</option></select>
+          </label>
+          <label class="campo">Quiero
+            <select name="Quiero"><option>Vender</option><option>Alquilar</option><option>Solo saber el valor</option></select>
+          </label>
+        </div>
+        <button class="btn btn--tinta btn--cuadrado" type="submit">Pedir tasación sin cargo por WhatsApp</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="contenedor seccion" id="nosotros">
+    <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start">
+      <div style="flex:1 1 440px">
+        <h2 class="titulo-seccion">Una inmobiliaria de la sierra, para la sierra</h2>
+        <p style="margin-top:18px;font-size:17px;color:var(--gris-2)">Desde hace más de 25 años trabajamos en Salsipuedes y las Sierras Chicas. Conocemos qué calles se inundan, qué lotes tienen escritura y qué barrio le conviene a cada familia.</p>
+        <p style="margin-top:14px;font-size:17px;color:var(--gris-2)">Además de vender y alquilar, administramos alquileres de punta a punta: cobranza, servicios, aumentos por índice y liquidación mensual al propietario.</p>
+        <a class="btn btn--borde" style="margin-top:26px" href="/administracion-de-alquileres/">Quiero que administren mi alquiler</a>
+      </div>
+      <div class="stats" style="flex:1 1 440px">
+        {SITE.stats.map((s) => <div class="stat"><b>{s.value}</b><span>{s.label}</span></div>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion seccion--blanca">
+    <div class="contenedor">
+      <div class="cabecera-seccion">
+        <h2 class="titulo-seccion">Lo que dicen nuestros clientes</h2>
+        {SITE.googleReviewsUrl && <a class="link-fuerte" href={SITE.googleReviewsUrl} rel="noopener">Ver todas las reseñas en Google</a>}
+      </div>
+      <div class="grilla grilla--chica">
+        {REVIEWS.map((r) => (
+          <figure class="resena">
+            <p class="resena__estrellas" aria-label="5 de 5 estrellas">★★★★★</p>
+            <blockquote>{r.text}</blockquote>
+            <figcaption>{r.name} · {r.context}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="contenedor seccion">
+    <h2 class="titulo-seccion">Guías para comprar y alquilar en las sierras</h2>
+    <p class="bajada" style="margin-bottom:32px">Lo que nos preguntan todas las semanas, respondido con datos de la zona.</p>
+    <div class="grilla">
+      {GUIAS.map((g) => (
+        <a class="guia-card" href={`/guias/${g.slug}/`}>
+          <span class="guia-card__tag">{g.tag}</span>
+          <h3>{g.titulo}</h3>
+          <p>{g.bajada}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="contenedor faq" style="padding-bottom:96px">
+    <h2 class="titulo-seccion" style="margin-bottom:24px">Preguntas frecuentes</h2>
+    <div class="faq__lista">
+      {FAQS.map((f, i) => (
+        <details open={i === 0}>
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-buscador]');
+  const op = form?.querySelector<HTMLInputElement>('input[name="op"]');
+  form?.querySelectorAll<HTMLButtonElement>('[data-op]').forEach((b) => {
+    b.addEventListener('click', () => {
+      form.querySelectorAll('[data-op]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      if (op) op.value = b.dataset.op || 'venta';
+    });
+  });
+  // Quitar campos vacíos de la URL
+  form?.addEventListener('submit', () => {
+    form.querySelectorAll<HTMLSelectElement>('select').forEach((s) => { if (!s.value) s.disabled = true; });
+  });
+</script>

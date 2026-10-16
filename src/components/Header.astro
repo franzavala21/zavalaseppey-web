@@ -1,0 +1,65 @@
+---
+import { SITE, waLink } from '../config/site';
+import Icono from './Icono.astro';
+
+interface Props { sobreHero?: boolean; activo?: string }
+const { sobreHero = false, activo = '' } = Astro.props;
+
+const links = [
+  { href: '/venta/', label: 'Comprar', id: 'venta' },
+  { href: '/alquiler/', label: 'Alquilar', id: 'alquiler' },
+  { href: '/administracion-de-alquileres/', label: 'Administración', id: 'administracion' },
+  { href: '/nosotros/', label: 'Nosotros', id: 'nosotros' },
+  { href: '/contacto/', label: 'Contacto', id: 'contacto' },
+];
+const logo = sobreHero ? '/logo-light.png' : '/logo-dark.png';
+---
+<header class:list={['header', { 'header--sobre': sobreHero }]}>
+  {sobreHero && (
+    <div class="header__info">
+      <div class="contenedor">
+        <div style="display:flex;flex-wrap:wrap;gap:6px 24px">
+          <span>{SITE.address.street} · {SITE.address.locality}, {SITE.address.region}</span>
+          <span>{SITE.hours.map((h) => `${h.label} ${h.value}`).join(' · ')}</span>
+        </div>
+        <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </div>
+    </div>
+  )}
+  <div class="contenedor header__fila" style="position:relative">
+    <a class="header__logo" href="/" aria-label={`${SITE.name}, inicio`}>
+      <img src={logo} alt={SITE.legalName} width="600" height="159" />
+    </a>
+    <nav class="header__nav" aria-label="Principal">
+      {links.map((l) => <a href={l.href} aria-current={activo === l.id ? 'page' : undefined}>{l.label}</a>)}
+    </nav>
+    <div class="header__acciones">
+      <a class="btn btn--tasar" href="/tasaciones/">Tasá tu propiedad</a>
+      <a class="btn btn--wa" href={waLink()} aria-label={`WhatsApp ${SITE.whatsappLabel}`} rel="noopener">
+        <Icono nombre="wa" /><span class="wa-num">{SITE.whatsappLabel}</span>
+      </a>
+      <button class="menu-btn" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-movil" data-menu-btn>
+        <Icono nombre="menu" tam={20} />
+      </button>
+    </div>
+    <nav id="menu-movil" class="menu-movil" aria-label="Menú" data-abierto="false">
+      {links.map((l) => <a href={l.href}>{l.label}</a>)}
+      <a href="/tasaciones/">Tasá tu propiedad</a>
+      <a href="/guias/">Guías</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-menu-btn]');
+  const menu = document.getElementById('menu-movil');
+  btn?.addEventListener('click', () => {
+    const abierto = menu?.dataset.abierto === 'true';
+    if (menu) menu.dataset.abierto = String(!abierto);
+    btn.setAttribute('aria-expanded', String(!abierto));
+    btn.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu?.dataset.abierto === 'true') { menu.dataset.abierto = 'false'; btn?.setAttribute('aria-expanded', 'false'); btn?.focus(); }
+  });
+</script>

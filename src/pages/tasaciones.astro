@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import Migas from '../components/Migas.astro';
+import { SITE } from '../config/site';
+import { breadcrumbJsonLd } from '../lib/seo';
+
+const migas = [{ name: 'Inicio', href: '/' }, { name: 'Tasaciones', href: '/tasaciones/' }];
+---
+<Base
+  title="Tasaciones en Salsipuedes y Sierras Chicas"
+  description="Tasamos tu casa, terreno o local en Salsipuedes, Río Ceballos y Unquillo con datos reales de la zona. Sin cargo si vendés o alquilás con nosotros. Respuesta en el día."
+  jsonLd={breadcrumbJsonLd(migas)}
+>
+  <div class="contenedor" style="padding-top:28px"><Migas items={migas} /></div>
+  <section class="tasar" style="margin-top:28px">
+    <div class="contenedor seccion tasar__grid">
+      <div>
+        <p class="hero__kicker" style="color:#FFE2D6">Para propietarios</p>
+        <h1 style="font-weight:700;font-size:clamp(32px,4vw,46px)">Tasaciones en Salsipuedes y Sierras Chicas</h1>
+        <p class="tasar__txt">Tasamos con datos reales de venta en Salsipuedes, Río Ceballos y Unquillo, no con el precio del aviso de al lado. Te respondemos en el día.</p>
+      </div>
+      <form class="form-blanca" aria-label="Pedir tasación" data-wa="Hola! Quiero pedir una tasación." data-numero={SITE.whatsapp}>
+        <label class="campo">Nombre<input type="text" name="Nombre" autocomplete="name" required /></label>
+        <label class="campo">Dirección o barrio de la propiedad<input type="text" name="Propiedad" /></label>
+        <div class="fila-campos">
+          <label class="campo">Localidad
+            <select name="Localidad"><option>Salsipuedes</option><option>Río Ceballos</option><option>Unquillo</option><option>Otra</option></select>
+          </label>
+          <label class="campo">Tipo
+            <select name="Tipo"><option>Casa</option><option>Terreno</option><option>Departamento</option><option>Local</option><option>Otro</option></select>
+          </label>
+        </div>
+        <label class="campo">Quiero
+          <select name="Quiero"><option>Vender</option><option>Alquilar</option><option>Solo saber el valor</option></select>
+        </label>
+        <button class="btn btn--tinta btn--cuadrado" type="submit">Pedir tasación por WhatsApp</button>
+      </form>
+    </div>
+  </section>
+  <section class="contenedor seccion prosa">
+    <h2>Cómo tasamos</h2>
+    <p>Comparamos tu propiedad con operaciones reales y con la oferta publicada en la misma zona, y ajustamos por lo que el portal no muestra: estado, orientación, documentación, accesos y servicios del barrio.</p>
+    <h2>Qué necesitamos</h2>
+    <ul>
+      <li>Dirección y una visita a la propiedad.</li>
+      <li>Superficie del terreno y lo construido (si tenés los planos, mejor).</li>
+      <li>Saber si tiene escritura y planos aprobados: define si un comprador puede usar crédito hipotecario.</li>
+    </ul>
+    <h2>Y después</h2>
+    <p>Si decidís vender o alquilar con nosotros, publicamos con fotos y video en nuestro sitio, en los portales y en redes, y coordinamos todas las visitas.</p>
+  </section>
+</Base>
