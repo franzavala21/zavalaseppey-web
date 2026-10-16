@@ -139,6 +139,7 @@ function nombreLugar(s: string) {
   return s.trim().replace(/(?<=\S\s)(De|Del|La|Las|Los|Y)(?=\s)/g, (m) => m.toLowerCase());
 }
 
+// Verificado con la API (oct. 2026): credit_eligible viene como "Apto crédito" o "No especificado"
 function esAptoCredito(p: any) {
   const v = p.credit_eligible;
   if (typeof v === 'boolean') return v;
@@ -190,7 +191,7 @@ export function normalizar(p: any): Propiedad | null {
     .map((v: any) => v?.player_url || v?.url)
     .filter((u: any) => typeof u === 'string' && /^https:\/\//.test(u));
 
-  // En Tokko: suite_amount = dormitorios, room_amount = ambientes
+  // En Tokko: suite_amount = dormitorios, room_amount = ambientes (verificado: room_amount casi siempre viene en 0)
   const dormitorios = num(p.suite_amount);
   // Los títulos de Tokko suelen venir en mayúsculas y con formatos dispares:
   // el h1 y el <title> se arman con los datos, y el de Tokko va como subtítulo.

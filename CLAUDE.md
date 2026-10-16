@@ -31,6 +31,5 @@ WhatsApp 351 819-6433 · Av. Pasaje Colón esq. Güemes, Local 7, Salsipuedes.
 - `integraciones/redirecciones.mjs` 301 desde el sitio viejo de Tokko (`/p/<id>` y secciones), se escriben en `.vercel/output/config.json` al compilar
 
 ## Pendientes conocidos
-- Verificar con la API real los nombres de campos de Tokko (sobre todo `credit_eligible`, `suite_amount`, `photos`, `is_starred_on_web`).
 - Reseñas reales de Google, link de Facebook, video y foto del inicio.
 - Completar la guía `vivir-en-salsipuedes.md` y sacarla de borrador.
