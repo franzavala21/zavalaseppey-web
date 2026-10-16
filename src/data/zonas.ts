@@ -10,12 +10,15 @@ export type Zona = {
   intro: string;
   bloques: { titulo: string; texto: string }[];
   destacada: boolean;
+  // Foto de la tarjeta del inicio (public/zonas/). Las de Wikimedia Commons llevan crédito por licencia.
+  foto?: { src: string; alt: string; autor: string; licencia: string; url: string };
 };
 
 export const ZONAS: Zona[] = [
   {
     slug: 'salsipuedes',
     nombre: 'Salsipuedes',
+    foto: { src: '/zonas/salsipuedes.webp', alt: 'Cartel de bienvenida a Salsipuedes', autor: 'Claudio Elias', licencia: 'dominio público', url: 'https://commons.wikimedia.org/wiki/File:Salsipuedes055.JPG' },
     alias: ['salsipuedes'],
     resumen: 'La puerta de entrada a las Sierras Chicas. A 35 km de Córdoba por Ruta E-53.',
     intro:
@@ -41,6 +44,7 @@ export const ZONAS: Zona[] = [
   {
     slug: 'rio-ceballos',
     nombre: 'Río Ceballos',
+    foto: { src: '/zonas/rio-ceballos.webp', alt: 'Lago del dique La Quebrada, Río Ceballos', autor: 'Claudio Elias', licencia: 'dominio público', url: 'https://commons.wikimedia.org/wiki/File:Rio_Ceballos_141.JPG' },
     alias: ['rio ceballos', 'río ceballos'],
     resumen: 'Sierra con todos los servicios: comercio, colegios y vida de pueblo grande.',
     intro:
@@ -61,6 +65,7 @@ export const ZONAS: Zona[] = [
   {
     slug: 'unquillo',
     nombre: 'Unquillo',
+    foto: { src: '/zonas/unquillo.webp', alt: 'Mural con la Capilla Buffo en Unquillo', autor: 'DanielleJoyArg', licencia: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Mural_en_Unquillo_con_Capilla_Buffo.jpg' },
     alias: ['unquillo'],
     resumen: 'Casco urbano accesible y barrios cerrados como Las Corzuelas y Corral de Barrancas.',
     intro:
@@ -77,6 +82,7 @@ export const ZONAS: Zona[] = [
   {
     slug: 'cordoba',
     nombre: 'Córdoba Capital',
+    foto: { src: '/zonas/cordoba.webp', alt: 'Edificios de Córdoba Capital de noche con el Faro del Bicentenario', autor: 'Ed López', licencia: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:El_Faro_de_C%C3%B3rdoba_(cropped).jpg' },
     // Solo "Córdoba Capital": "Cordoba" a secas es la provincia en las ubicaciones de Tokko
     alias: ['cordoba capital', 'córdoba capital'],
     resumen: 'Departamentos seleccionados, muchos aptos para crédito hipotecario.',

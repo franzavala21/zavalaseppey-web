@@ -116,7 +116,7 @@ const masBuscado = [
       <div class="grilla grilla--chica">
         {ZONAS.map((z) => (
           <a class="zona-card" href={`/venta/${z.slug}/`}>
-            <div class="zona-card__img"></div>
+            <div class="zona-card__img">{z.foto && <img src={z.foto.src} alt={z.foto.alt} width="960" height="600" loading="lazy" decoding="async" />}</div>
             <div class="zona-card__txt">
               <h3>{z.nombre}</h3>
               <p>{z.resumen}</p>
@@ -125,6 +125,7 @@ const masBuscado = [
           </a>
         ))}
       </div>
+      <p class="nota" style="margin-top:16px;font-size:12px">Fotos: {ZONAS.filter((z) => z.foto).map((z, i) => <>{i > 0 && " · "}<a href={z.foto!.url}>{z.nombre}, {z.foto!.autor} ({z.foto!.licencia})</a></>)}, vía Wikimedia Commons.</p>
     </div>
   </section>
 
