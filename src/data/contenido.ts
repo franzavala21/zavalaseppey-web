@@ -36,10 +36,9 @@ export const GUIAS: { slug: string; tag: string; titulo: string; bajada: string;
   },
   {
     slug: 'vivir-en-salsipuedes',
-    borrador: true, // tiene partes [completar]: no se muestra ni se indexa hasta completarla
     tag: 'Mudarse a las sierras',
-    titulo: 'Vivir en Salsipuedes trabajando en Córdoba: lo que hay que saber',
-    bajada: 'Distancias, transporte, servicios y en qué barrios conviene buscar.',
+    titulo: 'Vivir en Salsipuedes: distancia a Córdoba, servicios y barrios',
+    bajada: 'Cómo se viaja a Córdoba, qué escuelas, salud e internet hay y cómo es cada barrio.',
   },
 ];
 

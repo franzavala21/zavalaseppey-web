@@ -7,7 +7,7 @@ import redirecciones from './integraciones/redirecciones.mjs';
 const SITE = 'https://inmobiliariazavalaseppey.com.ar';
 
 // Páginas que todavía no se muestran a Google (guías sin terminar)
-const BORRADORES = ['/guias/vivir-en-salsipuedes/'];
+const BORRADORES = [];
 
 export default defineConfig({
   site: SITE,

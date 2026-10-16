@@ -32,4 +32,3 @@ WhatsApp 351 819-6433 · Av. Pasaje Colón esq. Güemes, Local 7, Salsipuedes.
 
 ## Pendientes conocidos
 - Reseñas reales de Google, link de Facebook, video y foto del inicio.
-- Completar la guía `vivir-en-salsipuedes.md` y sacarla de borrador.
