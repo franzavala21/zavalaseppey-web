@@ -6,6 +6,7 @@ Sitio de una inmobiliaria de Salsipuedes (Sierras Chicas, Córdoba, Argentina). 
 - Astro (salida 100% estática), TypeScript, CSS propio en `src/styles/global.css`. Sin frameworks de UI.
 - Propiedades desde la API de Tokko Broker, leídas **solo al compilar** (`src/lib/tokko.ts`).
 - Hosting: Vercel. Actualización cada 6 h con `.github/workflows/actualizar-propiedades.yml` (deploy hook).
+- Dominio: DNS en Cloudflare (nube gris), raíz `A 76.76.21.21`, `www` CNAME a Vercel y redirige a la raíz. Los MX y el TXT son del email (Cloudflare Email Routing): no tocarlos.
 - Comandos: `npm run dev`, `npm run build`. Sin `TOKKO_API_KEY` usa `src/lib/fixtures.ts`.
 
 ## Reglas que no se rompen
