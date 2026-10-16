@@ -7,7 +7,6 @@ import { breadcrumbJsonLd } from '../lib/seo';
 
 const migas = [{ name: 'Inicio', href: '/' }, { name: 'Contacto', href: '/contacto/' }];
 const direccion = `${SITE.address.street}, ${SITE.address.locality}, ${SITE.address.region}`;
-const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
 ---
 <Base
   title="Contacto"
@@ -21,7 +20,7 @@ const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComp
     <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
       <div style="flex:1 1 360px;display:flex;flex-direction:column;gap:22px">
         <a class="btn btn--wa btn--cuadrado" style="min-height:56px;align-self:flex-start" href={waLink()} rel="noopener"><Icono nombre="wa" tam={20} />WhatsApp {SITE.whatsappLabel}</a>
-        <div><h2 style="font-size:18px;margin-bottom:6px">Oficina</h2><p>{SITE.address.street}<br />{SITE.address.locality}, {SITE.address.region}</p><p style="margin-top:6px"><a class="link-fuerte" href={mapsUrl} rel="noopener">Cómo llegar</a></p></div>
+        <div><h2 style="font-size:18px;margin-bottom:6px">Oficina</h2><p>{SITE.address.street}<br />{SITE.address.locality}, {SITE.address.region}</p><p style="margin-top:6px"><a class="link-fuerte" href={SITE.mapsUrl} rel="noopener">Cómo llegar</a></p></div>
         <div><h2 style="font-size:18px;margin-bottom:6px">Horarios</h2>{SITE.hours.map((h) => <p>{h.label}: {h.value}</p>)}</div>
         <div><h2 style="font-size:18px;margin-bottom:6px">Email</h2><p><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p></div>
       </div>

@@ -6,12 +6,13 @@ const anio = new Date().getFullYear();
 <footer class="pie" id="contacto-pie">
   <div class="contenedor pie__grid">
     <div>
-      <img src="/logo-light.png" alt={SITE.legalName} width="600" height="159" loading="lazy" />
+      <img src="/logo-light.webp" alt={SITE.legalName} width="600" height="159" loading="lazy" />
       <p>Venta, alquiler y administración de propiedades en Salsipuedes y Sierras Chicas desde hace más de 25 años.</p>
     </div>
     <div>
       <h2>Contacto</h2>
       <p>{SITE.address.street}<br />{SITE.address.locality}, {SITE.address.region}</p>
+      <p><a href={SITE.mapsUrl} style="color:#fff">Cómo llegar</a></p>
       <p><a href={waLink()} style="color:#fff">WhatsApp {SITE.whatsappLabel}</a></p>
       <p><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
     </div>

@@ -12,7 +12,6 @@ const links = [
   { href: '/nosotros/', label: 'Nosotros', id: 'nosotros' },
   { href: '/contacto/', label: 'Contacto', id: 'contacto' },
 ];
-const logo = sobreHero ? '/logo-light.webp' : '/logo-dark.webp';
 ---
 <header class:list={['header', { 'header--sobre': sobreHero }]}>
   {sobreHero && (
@@ -28,7 +27,8 @@ const logo = sobreHero ? '/logo-light.webp' : '/logo-dark.webp';
   )}
   <div class="contenedor header__fila" style="position:relative">
     <a class="header__logo" href="/" aria-label={`${SITE.name}, inicio`}>
-      <img src={logo} alt={SITE.legalName} width="600" height="159" />
+      {sobreHero && <img class="header__logo-claro" src="/logo-light.webp" alt={SITE.legalName} width="600" height="159" />}
+      <img class="header__logo-oscuro" src="/logo-dark.webp" alt={sobreHero ? "" : SITE.legalName} width="600" height="159" />
     </a>
     <nav class="header__nav" aria-label="Principal">
       {links.map((l) => <a href={l.href} aria-current={activo === l.id ? 'page' : undefined}>{l.label}</a>)}
@@ -51,6 +51,14 @@ const logo = sobreHero ? '/logo-light.webp' : '/logo-dark.webp';
 </header>
 
 <script>
+  // En el inicio la barra arranca transparente sobre la foto y se vuelve blanca al bajar
+  const header = document.querySelector<HTMLElement>('.header--sobre');
+  if (header) {
+    const marcar = () => header.classList.toggle('header--fijo', window.scrollY > 40);
+    marcar();
+    window.addEventListener('scroll', marcar, { passive: true });
+  }
+
   const btn = document.querySelector<HTMLButtonElement>('[data-menu-btn]');
   const menu = document.getElementById('menu-movil');
   btn?.addEventListener('click', () => {

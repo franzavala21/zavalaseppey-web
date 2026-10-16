@@ -64,6 +64,14 @@ const schemas = [orgJsonLd(), ...(Array.isArray(jsonLd) ? jsonLd : [jsonLd])];
     <a class="wa-flotante" href={waLink()} aria-label="Escribinos por WhatsApp" rel="noopener"><Icono nombre="wa" tam={28} /></a>
 
     <script>
+      // Links a otros sitios (WhatsApp, Maps, Instagram, Google): en otra pestaña, así no se pierde la página
+      document.querySelectorAll<HTMLAnchorElement>('a[href^="http"]').forEach((a) => {
+        if (a.host === location.host) return;
+        a.target = '_blank';
+        a.rel = 'noopener';
+      });
+    </script>
+    <script>
       // Formularios que se envían por WhatsApp: arman el mensaje con los campos completados.
       document.querySelectorAll<HTMLFormElement>('form[data-wa]').forEach((form) => {
         form.addEventListener('submit', (e) => {

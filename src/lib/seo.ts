@@ -12,6 +12,7 @@ export function orgJsonLd() {
     name: SITE.legalName,
     alternateName: SITE.name,
     url: SITE.url,
+    hasMap: SITE.mapsUrl,
     logo: abs('/logo-dark.png'),
     image: abs('/logo-dark.png'),
     telephone: '+' + SITE.whatsapp,

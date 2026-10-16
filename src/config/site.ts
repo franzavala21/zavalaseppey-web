@@ -19,6 +19,7 @@ export const SITE = {
     country: 'AR',
     postalCode: '5113',
   },
+  mapsUrl: 'https://maps.app.goo.gl/uBABqDkcZpXf6A8t7', // "Cómo llegar" a la oficina en Google Maps
 
   hours: [
     { label: 'Lunes a viernes', value: '9 a 18', days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '18:00' },
