@@ -32,4 +32,5 @@ WhatsApp 351 819-6433 · Av. Pasaje Colón esq. Güemes, Local 7, Salsipuedes.
 - `integraciones/redirecciones.mjs` 301 desde el sitio viejo de Tokko (`/p/<id>` y secciones), se escriben en `.vercel/output/config.json` al compilar
 
 ## Pendientes conocidos
-- Reseñas reales de Google, link de Facebook, video y foto del inicio.
+- Link de Facebook, video y foto del inicio.
+- Confirmar los números de `stats` en `src/config/site.ts` (+25 años, +130 alquileres, +200 ventas). El "4,9 en Google" se sacó: la ficha real tiene 3,9.

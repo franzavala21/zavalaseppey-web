@@ -31,14 +31,13 @@ export const SITE = {
     facebook: '', // pegar el link de la página de Facebook
   },
 
-  googleReviewsUrl: '', // link "Ver todas las reseñas" del perfil de Google
+  googleReviewsUrl: 'https://maps.app.goo.gl/uBABqDkcZpXf6A8t7', // ficha de Google con todas las reseñas
   matricula: '', // N° de matrícula del corredor, si se quiere mostrar
 
   stats: [
     { value: '+25', label: 'años en Sierras Chicas' },
     { value: '+130', label: 'alquileres en administración' },
     { value: '+200', label: 'operaciones de venta cerradas' },
-    { value: '4,9', label: 'en reseñas de Google' },
   ],
 
   // Video de fondo del inicio. Subirlo a /public/video/hero.mp4 (y una foto a /public/video/hero.jpg)
@@ -52,9 +51,27 @@ export function waLink(text?: string) {
   return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }
 
-// Reseñas destacadas de Google. Reemplazar por las reales (texto textual, nombre y contexto).
-export const REVIEWS: { text: string; name: string; context: string }[] = [
-  { text: '[Reseña real de Google #1, copiada textual]', name: '[Nombre]', context: 'Compró en Salsipuedes' },
-  { text: '[Reseña real de Google #2]', name: '[Nombre]', context: 'Propietario, administra con nosotros' },
-  { text: '[Reseña real de Google #3]', name: '[Nombre]', context: 'Inquilino' },
+// Reseñas destacadas de Google, copiadas textuales de la ficha (todas de 5 estrellas).
+// Agregar solo reseñas reales, con el link a cada una.
+export const REVIEWS: { text: string; name: string; url: string }[] = [
+  {
+    text: 'Para sacarse el sombrero, la verdad excelente atención. Desde el primer contacto hasta que se concretó la operación. Muy puntuales con las reuniones, muy directos y sin letra chica, como tiene que ser. Buscando lo mejor para todas las partes involucradas. Muchas gracias Ignacio por tu compromiso y buena predisposición',
+    name: 'Gonzalo Pantalena',
+    url: 'https://maps.app.goo.gl/HQKMqKMuhCoWdd2N8',
+  },
+  {
+    text: 'Excelente atención y se ocupan mucho de cada propiedad que tienen. Ya trabajamos varias veces con ellos y los recomiendo siempre',
+    name: 'César Constantino Colomba Vicini',
+    url: 'https://maps.app.goo.gl/EhqXun4b5PPXttvr9',
+  },
+  {
+    text: 'Excelente la atención por parte de la inmobiliaria. Cumplieron con todo',
+    name: 'Familia Cacho',
+    url: 'https://maps.app.goo.gl/dfrHSsX8Dnxeo3dD6',
+  },
+  {
+    text: 'Tuve una muy buena experiencia. Excelente atención! Gracias por su amabilidad',
+    name: 'Lucila Canalini',
+    url: 'https://maps.app.goo.gl/mbGWrdcVsoZ8oKKH6',
+  },
 ];
