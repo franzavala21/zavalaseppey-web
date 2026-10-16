@@ -1,5 +1,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel';
+import redirecciones from './integraciones/redirecciones.mjs';
 
 // Dominio principal. Vercel redirige www → este dominio.
 const SITE = 'https://inmobiliariazavalaseppey.com.ar';
@@ -11,10 +13,13 @@ export default defineConfig({
   site: SITE,
   trailingSlash: 'always',
   build: { format: 'directory' },
+  // Salida estática igual que antes; el adapter permite que las redirecciones sean 301 reales
+  adapter: vercel(),
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/404') && !BORRADORES.some((b) => page.endsWith(b)),
+      filter: (page) => !page.includes('/404') && !page.includes('redirecciones-tokko') && !BORRADORES.some((b) => page.endsWith(b)),
       changefreq: 'daily',
     }),
+    redirecciones(),
   ],
 });

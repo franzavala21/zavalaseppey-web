@@ -4,7 +4,7 @@
 
 import { ZONAS } from '../data/zonas';
 import { FIXTURES } from './fixtures';
-import { formatoPrecio, quitarAcentos, slugify } from './text';
+import { formatoNumero, formatoPrecio, quitarAcentos, slugify } from './text';
 
 export type Operacion = 'venta' | 'alquiler' | 'temporario';
 
@@ -16,7 +16,8 @@ export type Propiedad = {
   id: string;
   slug: string;
   codigo: string;
-  titulo: string;
+  titulo: string; // generado con los datos: "Casa de 3 dormitorios en venta en Salsipuedes"
+  tituloTokko: string; // el título cargado en Tokko, se muestra como subtítulo
   descripcion: string;
   tipo: string; // "Casa"
   tipoSlug: string; // "casas"
@@ -99,14 +100,43 @@ const coord = (v: unknown): number | null => {
   return Number.isFinite(n) && n !== 0 ? n : null;
 };
 
-function zonaDe(textoUbicacion: string) {
-  const t = ' ' + quitarAcentos(textoUbicacion).toLowerCase() + ' ';
-  // Se busca primero las localidades más específicas (todas menos Córdoba Capital)
-  const orden = [...ZONAS].sort((a, b) => (a.slug === 'cordoba' ? 1 : 0) - (b.slug === 'cordoba' ? 1 : 0));
-  for (const z of orden) {
-    if (z.alias.some((a) => t.includes(quitarAcentos(a)))) return z;
-  }
-  return null;
+// Tokko arma la ubicación por niveles: "Argentina | Cordoba | Colon | Unquillo | Las Corzuelas".
+// Se compara nivel por nivel (no como texto suelto) para que la provincia "Cordoba"
+// no se confunda con Córdoba Capital.
+function zonaDe(niveles: string[]) {
+  const ns = niveles.map((n) => quitarAcentos(n).toLowerCase().trim());
+  return ZONAS.find((z) => z.alias.some((a) => ns.includes(quitarAcentos(a)))) ?? null;
+}
+
+// El `description` plano de Tokko pierde los saltos entre bloques del editor
+// ("1 dormitorio con placarBaño con antebaño"); `rich_description` (HTML) los conserva.
+function textoDescripcion(p: any): string {
+  const html: string = p.rich_description ?? '';
+  if (!html.trim()) return (p.description ?? '').trim();
+  const PARRAFO = '\u0000';
+  return html
+    // renglón vacío del editor o fin de <p> = nuevo párrafo
+    .replace(/<div[^>]*>\s*<br\s*\/?>\s*<\/div>|<\/p>/gi, PARRAFO)
+    // una seguidilla de etiquetas de bloque (</div><div>) = un solo salto de línea
+    .replace(/(?:\s*<\/?(?:div|p|li|h\d)(?:\s[^>]*)?>\s*)+/gi, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s*\u0000\s*/g, '\n\n')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&amp;/gi, '&')
+    .split('\n')
+    .map((l) => l.replace(/[ \t]+/g, ' ').trim())
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+// Tokko escribe "Agua De Oro", "Corral De Barranca": los conectores van en minúscula
+function nombreLugar(s: string) {
+  return s.trim().replace(/(?<=\S\s)(De|Del|La|Las|Los|Y)(?=\s)/g, (m) => m.toLowerCase());
 }
 
 function esAptoCredito(p: any) {
@@ -139,11 +169,11 @@ export function normalizar(p: any): Propiedad | null {
   if (!operaciones.length) return null;
 
   const loc = p.location ?? {};
-  const full = [loc.full_location, loc.short_location, loc.name].filter(Boolean).join(' | ');
-  const zona = zonaDe(full);
-  const nombreLoc: string = loc.name ?? '';
+  const niveles = [loc.full_location, loc.short_location, loc.name].filter(Boolean).join(' | ').split('|');
+  const zona = zonaDe(niveles);
+  const nombreLoc = nombreLugar(loc.name ?? '');
   // Si la ubicación de Tokko es un barrio, la localidad sale de la zona detectada
-  const localidad = zona?.nombre ?? (String(loc.short_location ?? '').split('|').pop()?.trim() || nombreLoc || 'Córdoba');
+  const localidad = zona?.nombre ?? (nombreLugar(String(loc.short_location ?? '').split('|').pop() ?? '') || nombreLoc || 'Córdoba');
   const barrio = zona && nombreLoc && quitarAcentos(nombreLoc).toLowerCase() !== quitarAcentos(zona.nombre).toLowerCase() && !zona.alias.includes(quitarAcentos(nombreLoc).toLowerCase()) ? nombreLoc : null;
   const ubicacion = barrio ? `Bº ${barrio.replace(/^b[º°o]?\.?\s+/i, '')}, ${localidad}` : localidad;
 
@@ -162,10 +192,13 @@ export function normalizar(p: any): Propiedad | null {
 
   // En Tokko: suite_amount = dormitorios, room_amount = ambientes
   const dormitorios = num(p.suite_amount);
-  const titulo: string = (p.publication_title || '').trim() || autoTitulo(tipo.nombre, dormitorios, operaciones[0], ubicacion);
+  // Los títulos de Tokko suelen venir en mayúsculas y con formatos dispares:
+  // el h1 y el <title> se arman con los datos, y el de Tokko va como subtítulo.
+  const titulo = autoTitulo(tipo, dormitorios, num(p.surface), operaciones[0], ubicacion);
+  const tituloTokko: string = (p.publication_title || '').replace(/\s+/g, ' ').trim();
 
   const slug = slugify(
-    [tipo.nombre, dormitorios ? `${dormitorios} dormitorios` : '', OPERACIONES[operaciones[0]].enLabel, barrio ?? '', localidad, p.id]
+    [tipo.nombre, dormitorios ? `${dormitorios} ${dormitorios === 1 ? 'dormitorio' : 'dormitorios'}` : '', OPERACIONES[operaciones[0]].enLabel, barrio ?? '', localidad, p.id]
       .filter(Boolean)
       .join(' ')
   );
@@ -175,7 +208,8 @@ export function normalizar(p: any): Propiedad | null {
     slug,
     codigo: p.reference_code ?? String(p.id),
     titulo,
-    descripcion: p.description ?? '',
+    tituloTokko,
+    descripcion: textoDescripcion(p),
     tipo: tipo.nombre,
     tipoSlug: tipo.slug,
     operaciones,
@@ -195,7 +229,8 @@ export function normalizar(p: any): Propiedad | null {
     supTerreno: num(p.surface),
     supTotal: num(p.total_surface),
     expensas: num(p.expenses),
-    antiguedad: typeof p.age === 'number' ? p.age : null,
+    // Tokko usa age 0 también para "sin dato" (todos los terrenos): 0 = a estrenar solo si el texto lo dice
+    antiguedad: typeof p.age === 'number' && p.age > 0 ? p.age : p.age === 0 && /a\s+estrenar/i.test(`${p.publication_title} ${p.description}`) ? 0 : null,
     aptoCredito: esAptoCredito(p),
     destacada: Boolean(p.is_starred_on_web),
     etiquetas: (p.tags ?? []).map((t: any) => t?.name).filter(Boolean),
@@ -205,8 +240,32 @@ export function normalizar(p: any): Propiedad | null {
   };
 }
 
-function autoTitulo(tipo: string, dorm: number | null, op: Operacion, ubicacion: string) {
-  return `${tipo}${dorm ? ` ${dorm} dorm.` : ''} ${OPERACIONES[op].enLabel} en ${ubicacion}`;
+function autoTitulo(tipo: { nombre: string; slug: string }, dorm: number | null, terreno: number | null, op: Operacion, ubicacion: string) {
+  let detalle = '';
+  if (dorm) detalle = ` de ${dorm} ${dorm === 1 ? 'dormitorio' : 'dormitorios'}`;
+  else if (terreno && ['terrenos', 'campos', 'quintas'].includes(tipo.slug)) detalle = ` de ${superficieTexto(terreno)}`;
+  return `${tipo.nombre}${detalle} ${OPERACIONES[op].enLabel} en ${ubicacion}`;
+}
+
+// Tokko guarda la superficie en m² aunque la unidad diga "HA"
+function superficieTexto(m2: number) {
+  return m2 >= 10000 ? `${formatoNumero(Math.round(m2 / 1000) / 10)} ha` : `${formatoNumero(m2)} m²`;
+}
+
+/** <title> de la ficha: suma superficie y precio para que no se repita entre fichas parecidas
+ *  ("Casa de 2 dormitorios, 300 m², en venta en Salsipuedes – USD 70.000"). Si aun así
+ *  coincide con otra, se agrega el código. */
+export function tituloSeo(p: Propiedad, todas: Propiedad[]) {
+  const armar = (x: Propiedad) => {
+    const op = x.operaciones[0];
+    const sup = x.supTerreno ?? x.supCubierta ?? x.supTotal;
+    const enOp = ` ${OPERACIONES[op].enLabel} en `;
+    const t = sup && !/ (m²|ha) /.test(x.titulo) ? x.titulo.replace(enOp, `, ${superficieTexto(sup)},${enOp}`) : x.titulo;
+    const precio = precioDe(x, op);
+    return precio?.valor ? `${t} – ${precio.texto}` : t;
+  };
+  const t = armar(p);
+  return todas.some((x) => x.id !== p.id && armar(x) === t) ? `${t} (cód. ${p.codigo})` : t;
 }
 
 // ---------- Lectura ----------

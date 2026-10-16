@@ -28,9 +28,9 @@ WhatsApp 351 819-6433 · Av. Pasaje Colón esq. Güemes, Local 7, Salsipuedes.
 - `src/lib/tokko.ts` conector y normalización · `src/lib/rutas.ts` qué listados existen · `src/lib/seo.ts` JSON-LD
 - `src/components/Listado.astro` listado reutilizable con filtros del lado del cliente
 - `src/pages/[op]/[zona]/[tipo]/` listados · `src/pages/propiedad/[slug].astro` ficha
+- `integraciones/redirecciones.mjs` 301 desde el sitio viejo de Tokko (`/p/<id>` y secciones), se escriben en `.vercel/output/config.json` al compilar
 
 ## Pendientes conocidos
 - Verificar con la API real los nombres de campos de Tokko (sobre todo `credit_eligible`, `suite_amount`, `photos`, `is_starred_on_web`).
-- Redirecciones 301 desde las URLs viejas del sitio de Tokko (falta relevarlas).
 - Reseñas reales de Google, link de Facebook, video y foto del inicio.
 - Completar la guía `vivir-en-salsipuedes.md` y sacarla de borrador.

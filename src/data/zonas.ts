@@ -77,7 +77,8 @@ export const ZONAS: Zona[] = [
   {
     slug: 'cordoba',
     nombre: 'Córdoba Capital',
-    alias: ['cordoba', 'córdoba', 'cordoba capital', 'córdoba capital', 'capital'],
+    // Solo "Córdoba Capital": "Cordoba" a secas es la provincia en las ubicaciones de Tokko
+    alias: ['cordoba capital', 'córdoba capital'],
     resumen: 'Departamentos seleccionados, muchos aptos para crédito hipotecario.',
     intro:
       'También trabajamos una selección de propiedades en Córdoba Capital, sobre todo departamentos aptos para crédito hipotecario y propiedades que nuestros clientes reciben en permuta.',
