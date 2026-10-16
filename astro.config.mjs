@@ -13,6 +13,8 @@ export default defineConfig({
   site: SITE,
   trailingSlash: 'always',
   build: { format: 'directory' },
+  // Las fotos de Tokko se optimizan al compilar (src/lib/fotos.ts)
+  image: { domains: ['static.tokkobroker.com'] },
   // Salida estática igual que antes; el adapter permite que las redirecciones sean 301 reales
   adapter: vercel(),
   integrations: [

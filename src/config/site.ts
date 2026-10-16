@@ -8,12 +8,15 @@ export const SITE = {
   description:
     'Inmobiliaria en Salsipuedes y Sierras Chicas desde hace más de 25 años. Casas, terrenos y alquileres en Salsipuedes, Río Ceballos y Unquillo. Tasaciones y administración de alquileres.',
 
-  whatsapp: '5493518196433', // formato internacional, sin + ni espacios
-  whatsappLabel: '351 819-6433',
+  // Dos líneas de WhatsApp (formato internacional, sin + ni espacios)
+  whatsapp: '5493515936478', // ventas, tasaciones y consultas generales
+  whatsappLabel: '351 593-6478',
+  whatsappAlquiler: '5493518196433', // alquileres y administración
+  whatsappAlquilerLabel: '351 819-6433',
   email: 'inmobiliariazavalaseppey@gmail.com',
 
   address: {
-    street: 'Av. Pasaje Colón esq. Güemes, Local 7',
+    street: 'Güemes, Local 7',
     locality: 'Salsipuedes',
     region: 'Córdoba',
     country: 'AR',
@@ -23,7 +26,7 @@ export const SITE = {
 
   hours: [
     { label: 'Lunes a viernes', value: '9 a 18', days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '18:00' },
-    { label: 'Sábados', value: '9 a 13', days: ['Saturday'], opens: '09:00', closes: '13:00' },
+    { label: 'Sábados', value: '10 a 13', days: ['Saturday'], opens: '10:00', closes: '13:00' },
   ],
 
   social: {
@@ -46,8 +49,14 @@ export const SITE = {
   heroPoster: '',
 };
 
-export function waLink(text?: string) {
-  const base = `https://wa.me/${SITE.whatsapp}`;
+export type Linea = 'general' | 'alquiler';
+
+export function waNumero(linea: Linea = 'general') {
+  return linea === 'alquiler' ? SITE.whatsappAlquiler : SITE.whatsapp;
+}
+
+export function waLink(text?: string, linea: Linea = 'general') {
+  const base = `https://wa.me/${waNumero(linea)}`;
   return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }
 

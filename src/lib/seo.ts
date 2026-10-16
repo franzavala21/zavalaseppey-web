@@ -16,6 +16,10 @@ export function orgJsonLd() {
     logo: abs('/logo-dark.png'),
     image: abs('/logo-dark.png'),
     telephone: '+' + SITE.whatsapp,
+    contactPoint: [
+      { '@type': 'ContactPoint', telephone: '+' + SITE.whatsapp, contactType: 'sales', availableLanguage: 'es' },
+      { '@type': 'ContactPoint', telephone: '+' + SITE.whatsappAlquiler, contactType: 'customer service', description: 'Alquileres y administración', availableLanguage: 'es' },
+    ],
     email: SITE.email,
     description: SITE.description,
     address: {

@@ -3,11 +3,12 @@ import Base from '../../layouts/Base.astro';
 import Migas from '../../components/Migas.astro';
 import TarjetaPropiedad from '../../components/TarjetaPropiedad.astro';
 import Icono from '../../components/Icono.astro';
-import { SITE, waLink } from '../../config/site';
+import { SITE, waLink, waNumero } from '../../config/site';
 import { getPropiedades, precioDe, similares, tituloSeo, OPERACIONES, type Propiedad } from '../../lib/tokko';
 import { urlListado, rutasTipo } from '../../lib/rutas';
 import { breadcrumbJsonLd, propiedadJsonLd, abs } from '../../lib/seo';
 import { formatoNumero, parrafos, resumen } from '../../lib/text';
+import { fotoWeb } from '../../lib/fotos';
 import { zonaPorSlug } from '../../data/zonas';
 
 export async function getStaticPaths() {
@@ -18,6 +19,7 @@ export async function getStaticPaths() {
 const { p } = Astro.props as { p: Propiedad };
 const todas = await getPropiedades();
 const op = p.operaciones[0];
+const linea = op === 'venta' ? 'general' : 'alquiler';
 const precio = precioDe(p, op);
 const otrosPrecios = p.precios.filter((x) => x !== precio);
 const zona = p.zona ? zonaPorSlug(p.zona) : undefined;
@@ -55,6 +57,8 @@ const mapa = p.lat && p.lng
   : null;
 const parecidas = similares(todas, p);
 const fotos = p.fotos;
+// La primera ocupa media galería; las otras cuatro, un cuarto
+const galeria = await Promise.all(fotos.slice(0, 5).map((f, i) => fotoWeb(f.url, i === 0 ? [800, 1200] : [480, 800])));
 ---
 <Base
   title={tituloSeo(p, todas)}
@@ -70,7 +74,7 @@ const fotos = p.fotos;
       <div class="galeria" data-galeria>
         {fotos.slice(0, 5).map((f, i) => (
           <button type="button" data-foto={i} aria-label={`Ampliar foto ${i + 1} de ${fotos.length}`}>
-            <img src={i === 0 ? f.url : f.thumb} alt={f.alt} width="800" height="600" loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
+            <img src={galeria[i].src} srcset={galeria[i].srcset || undefined} sizes={i === 0 ? '(max-width: 700px) 100vw, 50vw' : '(max-width: 700px) 100vw, 25vw'} alt={f.alt} width="800" height="600" loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
             {i === 4 && fotos.length > 5 && <span class="galeria__mas">Ver las {fotos.length} fotos</span>}
           </button>
         ))}
@@ -133,9 +137,9 @@ const fotos = p.fotos;
 
       <aside class="contacto-lateral" aria-label="Consultar por esta propiedad">
         <h2>¿Te interesa? Coordinemos la visita</h2>
-        <a class="btn btn--wa btn--cuadrado" style="min-height:54px" href={waLink(mensaje)} rel="noopener"><Icono nombre="wa" tam={20} />Consultar por WhatsApp</a>
+        <a class="btn btn--wa btn--cuadrado" style="min-height:54px" href={waLink(mensaje, linea)} rel="noopener"><Icono nombre="wa" tam={20} />Consultar por WhatsApp</a>
         <p class="nota" style="text-align:center">o dejanos tus datos y te escribimos</p>
-        <form style="display:flex;flex-direction:column;gap:14px" data-wa={mensaje} data-numero={SITE.whatsapp}>
+        <form style="display:flex;flex-direction:column;gap:14px" data-wa={mensaje} data-numero={waNumero(linea)}>
           <label class="campo">Nombre<input type="text" name="Nombre" autocomplete="name" required /></label>
           <label class="campo">Teléfono<input type="tel" name="Teléfono" autocomplete="tel" /></label>
           <label class="campo">Mensaje<textarea name="Mensaje" rows="3"></textarea></label>

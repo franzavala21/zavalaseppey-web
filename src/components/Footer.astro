@@ -13,7 +13,8 @@ const anio = new Date().getFullYear();
       <h2>Contacto</h2>
       <p>{SITE.address.street}<br />{SITE.address.locality}, {SITE.address.region}</p>
       <p><a href={SITE.mapsUrl} style="color:#fff">Cómo llegar</a></p>
-      <p><a href={waLink()} style="color:#fff">WhatsApp {SITE.whatsappLabel}</a></p>
+      <p><a href={waLink()} style="color:#fff">Ventas y tasaciones: {SITE.whatsappLabel}</a></p>
+      <p><a href={waLink(undefined, 'alquiler')} style="color:#fff">Alquileres: {SITE.whatsappAlquilerLabel}</a></p>
       <p><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
     </div>
     <div>

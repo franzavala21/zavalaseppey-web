@@ -87,7 +87,7 @@ const hayCredito = items.some((p) => p.aptoCredito);
       <div class="vacio" data-vacio hidden={items.length > 0}>
         <p style="font:600 18px var(--fuente-titulos);margin-bottom:8px">No hay propiedades con esos filtros ahora mismo.</p>
         <p style="margin-bottom:18px">Contanos qué buscás y te avisamos cuando entre algo así: muchas propiedades se venden antes de publicarse.</p>
-        <a class="btn btn--wa" href={waLink(`Hola! Estoy buscando: ${h1}`)} rel="noopener">Avisame por WhatsApp</a>
+        <a class="btn btn--wa" href={waLink(`Hola! Estoy buscando: ${h1}`, op && op !== 'venta' ? 'alquiler' : 'general')} rel="noopener">Avisame por WhatsApp</a>
       </div>
     </section>
   </div>

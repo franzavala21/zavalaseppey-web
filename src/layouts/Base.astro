@@ -81,7 +81,10 @@ const schemas = [orgJsonLd(), ...(Array.isArray(jsonLd) ? jsonLd : [jsonLd])];
             const val = String(v).trim();
             if (val) lineas.push(`${k}: ${val}`);
           });
-          const url = `https://wa.me/${form.dataset.numero}?text=${encodeURIComponent(lineas.join('\n'))}`;
+          // El formulario de contacto manda las consultas de alquiler a la línea de alquileres
+          const busco = String(new FormData(form).get('Busco') ?? '');
+          const numero = form.dataset.numeroAlquiler && /alquil/i.test(busco) ? form.dataset.numeroAlquiler : form.dataset.numero;
+          const url = `https://wa.me/${numero}?text=${encodeURIComponent(lineas.join('\n'))}`;
           window.open(url, '_blank', 'noopener');
         });
       });

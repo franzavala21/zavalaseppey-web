@@ -10,7 +10,7 @@ const direccion = `${SITE.address.street}, ${SITE.address.locality}, ${SITE.addr
 ---
 <Base
   title="Contacto"
-  description={`Escribinos por WhatsApp al ${SITE.whatsappLabel} o visitanos en ${direccion}. ${SITE.hours.map((h) => `${h.label} ${h.value}`).join(', ')}.`}
+  description={`Escribinos por WhatsApp al ${SITE.whatsappLabel} (ventas y tasaciones) o al ${SITE.whatsappAlquilerLabel} (alquileres), o visitanos en ${direccion}. ${SITE.hours.map((h) => `${h.label} ${h.value}`).join(', ')}.`}
   activo="contacto"
   jsonLd={breadcrumbJsonLd(migas)}
 >
@@ -19,12 +19,15 @@ const direccion = `${SITE.address.street}, ${SITE.address.locality}, ${SITE.addr
     <h1 style="margin:22px 0 32px;font-weight:700;font-size:clamp(30px,4vw,44px)">Contacto</h1>
     <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
       <div style="flex:1 1 360px;display:flex;flex-direction:column;gap:22px">
-        <a class="btn btn--wa btn--cuadrado" style="min-height:56px;align-self:flex-start" href={waLink()} rel="noopener"><Icono nombre="wa" tam={20} />WhatsApp {SITE.whatsappLabel}</a>
+        <div style="display:flex;flex-wrap:wrap;gap:12px">
+          <a class="btn btn--wa btn--cuadrado" style="min-height:56px" href={waLink()} rel="noopener"><Icono nombre="wa" tam={20} />Ventas y tasaciones · {SITE.whatsappLabel}</a>
+          <a class="btn btn--wa btn--cuadrado" style="min-height:56px" href={waLink(undefined, 'alquiler')} rel="noopener"><Icono nombre="wa" tam={20} />Alquileres · {SITE.whatsappAlquilerLabel}</a>
+        </div>
         <div><h2 style="font-size:18px;margin-bottom:6px">Oficina</h2><p>{SITE.address.street}<br />{SITE.address.locality}, {SITE.address.region}</p><p style="margin-top:6px"><a class="link-fuerte" href={SITE.mapsUrl} rel="noopener">Cómo llegar</a></p></div>
         <div><h2 style="font-size:18px;margin-bottom:6px">Horarios</h2>{SITE.hours.map((h) => <p>{h.label}: {h.value}</p>)}</div>
         <div><h2 style="font-size:18px;margin-bottom:6px">Email</h2><p><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p></div>
       </div>
-      <form class="form-blanca" style="flex:1 1 420px;border:1px solid var(--linea)" aria-label="Escribinos" data-wa="Hola! Les escribo desde la web." data-numero={SITE.whatsapp}>
+      <form class="form-blanca" style="flex:1 1 420px;border:1px solid var(--linea)" aria-label="Escribinos" data-wa="Hola! Les escribo desde la web." data-numero={SITE.whatsapp} data-numero-alquiler={SITE.whatsappAlquiler}>
         <h2 style="font-size:22px">Escribinos</h2>
         <label class="campo">Nombre<input type="text" name="Nombre" autocomplete="name" required /></label>
         <label class="campo">Busco

@@ -2,6 +2,7 @@
 import type { Operacion, Propiedad } from '../lib/tokko';
 import { precioDe, OPERACIONES } from '../lib/tokko';
 import { formatoNumero } from '../lib/text';
+import { fotoWeb } from '../lib/fotos';
 
 interface Props { p: Propiedad; op?: Operacion; nivel?: 'h2' | 'h3'; prioridad?: boolean }
 const { p, op, nivel = 'h3', prioridad = false } = Astro.props;
@@ -19,6 +20,7 @@ const datos = [
 ].filter(Boolean).slice(0, 3);
 const href = `/propiedad/${p.slug}/`;
 const foto = p.fotos[0];
+const img = foto ? await fotoWeb(foto.url, [480, 800]) : null;
 ---
 <article
   class="tarjeta"
@@ -34,7 +36,7 @@ const foto = p.fotos[0];
 >
   <a class="tarjeta__foto" href={href} tabindex="-1" aria-hidden="true">
     {foto
-      ? <img src={foto.thumb} alt="" width="640" height="480" loading={prioridad ? 'eager' : 'lazy'} decoding="async" />
+      ? <img src={img!.src} srcset={img!.srcset || undefined} sizes="(max-width: 700px) 100vw, 400px" alt="" width="640" height="480" loading={prioridad ? 'eager' : 'lazy'} decoding="async" />
       : <span class="tarjeta__sinfoto">Fotos próximamente</span>}
     <span class:list={['sello', 'sello--op', { 'sello--alquiler': operacion !== 'venta' }]}>{OPERACIONES[operacion].label}</span>
     {extra && <span class="sello sello--extra">{extra}</span>}
