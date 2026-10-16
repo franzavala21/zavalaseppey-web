@@ -40,6 +40,7 @@ p { margin: 0; }
 .bajada { margin-top: 8px; color: var(--gris); max-width: 640px; }
 .cabecera-seccion { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 32px; }
 .link-fuerte { font-family: var(--fuente-titulos); font-weight: 600; color: var(--naranja-texto); border-bottom: 2px solid var(--naranja); padding-bottom: 2px; }
+[hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .grilla { display: grid; gap: 28px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
@@ -305,3 +306,15 @@ p { margin: 0; }
 .wa-flotante:hover { background: #155646; color: var(--blanco); }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .hero__video { display: none; } }
+
+/* ---------- Paginación de listados ---------- */
+.paginacion { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 36px; }
+.paginacion button {
+  min-width: 44px; min-height: 44px; padding: 0 14px; border: 1px solid var(--linea-2); border-radius: 10px;
+  background: var(--blanco); color: var(--tinta); font: 600 15px var(--fuente-titulos); cursor: pointer;
+}
+.paginacion button:hover:not(:disabled) { border-color: var(--tinta); }
+.paginacion button[aria-current='page'] { background: var(--tinta); border-color: var(--tinta); color: var(--blanco); }
+.paginacion button:disabled { opacity: .4; cursor: default; }
+.paginacion span { padding: 0 4px; color: var(--gris); }
+@media (max-width: 700px) { .paginacion button[aria-label^='Página '] { padding: 0 10px; } }

@@ -84,6 +84,7 @@ const hayCredito = items.some((p) => p.aptoCredito);
           {items.map((p, i) => <TarjetaPropiedad p={p} op={op} prioridad={i < 2} />)}
         </div>
       ) : null}
+      <nav class="paginacion" aria-label="Páginas de resultados" data-paginacion hidden></nav>
       <div class="vacio" data-vacio hidden={items.length > 0}>
         <p style="font:600 18px var(--fuente-titulos);margin-bottom:8px">No hay propiedades con esos filtros ahora mismo.</p>
         <p style="margin-bottom:18px">Contanos qué buscás y te avisamos cuando entre algo así: muchas propiedades se venden antes de publicarse.</p>
@@ -119,6 +120,10 @@ const hayCredito = items.some((p) => p.aptoCredito);
     const vacio = document.querySelector<HTMLElement>('[data-vacio]');
     const orden = document.querySelector<HTMLSelectElement>('[data-orden]');
     const credito = panel.querySelector<HTMLButtonElement>('[data-f="credito"]');
+    const nav = document.querySelector<HTMLElement>('[data-paginacion]');
+    const POR_PAGINA = 12;
+    let pagina = Math.max(1, Number(new URLSearchParams(location.search).get('pagina')) || 1);
+    let coinciden = new Set<HTMLElement>(tarjetas);
     const campo = (n: string) => panel.querySelector<HTMLInputElement | HTMLSelectElement>(`[data-f="${n}"]`);
 
     if (panel.dataset.leerUrl === '1') {
@@ -130,7 +135,55 @@ const hayCredito = items.some((p) => p.aptoCredito);
       if (q.get('credito') === '1' && credito) credito.setAttribute('aria-pressed', 'true');
     }
 
-    const aplicar = () => {
+    // Números a mostrar: todos si son pocos; si no, 1 … actual-1 actual actual+1 … última
+    const numeros = (total: number) => {
+      if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+      const set = [...new Set([1, pagina - 1, pagina, pagina + 1, total])].filter((n) => n >= 1 && n <= total).sort((a, b) => a - b);
+      return set.flatMap((n, i) => (i > 0 && n - set[i - 1] > 1 ? [0, n] : [n]));
+    };
+
+    const boton = (texto: string, destino: number, extra: { actual?: boolean; deshabilitado?: boolean; etiqueta?: string } = {}) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = texto;
+      if (extra.etiqueta) b.setAttribute('aria-label', extra.etiqueta);
+      if (extra.actual) b.setAttribute('aria-current', 'page');
+      b.disabled = Boolean(extra.deshabilitado);
+      b.addEventListener('click', () => { pagina = destino; paginar(true); });
+      return b;
+    };
+
+    const paginar = (scroll = false) => {
+      const lista = ([...grilla.children] as HTMLElement[]).filter((t) => coinciden.has(t));
+      const total = Math.max(1, Math.ceil(lista.length / POR_PAGINA));
+      pagina = Math.min(pagina, total);
+      const desde = (pagina - 1) * POR_PAGINA;
+      for (const t of tarjetas) t.hidden = true;
+      lista.slice(desde, desde + POR_PAGINA).forEach((t) => (t.hidden = false));
+
+      if (nav) {
+        nav.hidden = total <= 1;
+        nav.replaceChildren(
+          boton('← Anterior', pagina - 1, { deshabilitado: pagina === 1, etiqueta: 'Página anterior' }),
+          ...numeros(total).map((n) => {
+            if (n) return boton(String(n), n, { actual: n === pagina, etiqueta: `Página ${n}` });
+            const s = document.createElement('span');
+            s.textContent = '…';
+            s.setAttribute('aria-hidden', 'true');
+            return s;
+          }),
+          boton('Siguiente →', pagina + 1, { deshabilitado: pagina === total, etiqueta: 'Página siguiente' })
+        );
+      }
+
+      const url = new URL(location.href);
+      if (pagina > 1) url.searchParams.set('pagina', String(pagina));
+      else url.searchParams.delete('pagina');
+      history.replaceState(null, '', url);
+      if (scroll) grilla.closest('.resultados')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    const aplicar = (volverAlInicio = true) => {
       const op = campo('op')?.value || '';
       const tipo = campo('tipo')?.value || '';
       const zona = campo('zona')?.value || '';
@@ -150,11 +203,12 @@ const hayCredito = items.some((p) => p.aptoCredito);
           (!dorm || Number(d.dorm) >= dorm) &&
           (!max || (d.moneda === moneda && Number(d.precio) > 0 && Number(d.precio) <= max)) &&
           (!soloCredito || d.credito === '1');
-        t.hidden = !ok;
-        if (ok) n++;
+        if (ok) { coinciden.add(t); n++; } else coinciden.delete(t);
       }
       if (cuenta) cuenta.textContent = String(n);
       if (vacio) vacio.hidden = n > 0;
+      if (volverAlInicio) pagina = 1;
+      paginar();
     };
 
     const ordenar = () => {
@@ -164,15 +218,17 @@ const hayCredito = items.some((p) => p.aptoCredito);
         modo === 'menor' ? val(a) - val(b) : modo === 'mayor' ? val(b) - val(a) : tarjetas.indexOf(a) - tarjetas.indexOf(b)
       );
       lista.forEach((t) => grilla.appendChild(t));
+      pagina = 1;
+      paginar();
     };
 
-    panel.addEventListener('change', aplicar);
-    panel.addEventListener('input', aplicar);
+    panel.addEventListener('change', () => aplicar());
+    panel.addEventListener('input', () => aplicar());
     credito?.addEventListener('click', () => {
       credito.setAttribute('aria-pressed', String(credito.getAttribute('aria-pressed') !== 'true'));
       aplicar();
     });
     orden?.addEventListener('change', ordenar);
-    aplicar();
+    aplicar(false); // al cargar se respeta la página que venga en la URL
   }
 </script>
