@@ -42,6 +42,7 @@ export type Propiedad = {
   aptoCredito: boolean;
   destacada: boolean;
   etiquetas: string[];
+  ubicacionExacta: boolean; // etiqueta "Ubicación exacta en web" en Tokko: el mapa muestra el punto exacto
   fotos: Foto[];
   videos: string[];
   actualizada: string | null;
@@ -140,6 +141,11 @@ function nombreLugar(s: string) {
 }
 
 // Verificado con la API (oct. 2026): credit_eligible viene como "Apto crédito" o "No especificado"
+// Etiqueta (común o personalizada) que habilita el punto exacto en el mapa de la ficha
+const ETIQUETA_UBICACION = /ubicacion exacta/;
+const nombresEtiquetas = (lista: any[] = []) => lista.map((t) => (typeof t === 'string' ? t : t?.name)).filter(Boolean) as string[];
+const esEtiquetaUbicacion = (t: string) => ETIQUETA_UBICACION.test(quitarAcentos(t).toLowerCase());
+
 function esAptoCredito(p: any) {
   const v = p.credit_eligible;
   if (typeof v === 'boolean') return v;
@@ -234,7 +240,8 @@ export function normalizar(p: any): Propiedad | null {
     antiguedad: typeof p.age === 'number' && p.age > 0 ? p.age : p.age === 0 && /a\s+estrenar/i.test(`${p.publication_title} ${p.description}`) ? 0 : null,
     aptoCredito: esAptoCredito(p),
     destacada: Boolean(p.is_starred_on_web),
-    etiquetas: (p.tags ?? []).map((t: any) => t?.name).filter(Boolean),
+    etiquetas: nombresEtiquetas(p.tags).filter((t) => !esEtiquetaUbicacion(t)),
+    ubicacionExacta: [...nombresEtiquetas(p.tags), ...nombresEtiquetas(p.custom_tags)].some(esEtiquetaUbicacion),
     fotos,
     videos,
     actualizada: p.deleted_at ? null : (p.created_at ?? null),

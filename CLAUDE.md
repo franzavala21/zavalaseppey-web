@@ -11,7 +11,7 @@ Sitio de una inmobiliaria de Salsipuedes (Sierras Chicas, Córdoba, Argentina). 
 
 ## Reglas que no se rompen
 1. **La clave de Tokko nunca va en el código**, ni en el cliente, ni en commits. Solo `process.env.TOKKO_API_KEY`.
-2. **Nunca publicar la dirección exacta** de una propiedad ni el nombre del propietario. El mapa muestra un círculo de zona aproximada (350 m) con el centro redondeado y corrido: la casa queda adentro, nunca en el centro.
+2. **Nunca publicar la dirección exacta** de una propiedad ni el nombre del propietario. El mapa muestra un círculo de zona aproximada (350 m) con el centro redondeado y corrido: la casa queda adentro, nunca en el centro. Excepción decidida por la inmobiliaria: si la propiedad tiene en Tokko la etiqueta "Ubicación exacta en web", la ficha muestra el pin exacto.
 3. Si Tokko falla o devuelve 0 propiedades, el build **debe fallar** (así queda online la versión anterior).
 4. No inventar datos: precios, superficies, reseñas o cifras que no vengan de Tokko o de `src/config/site.ts`. Lo que falta se muestra como "Consultar".
 5. Apto crédito: la inmobiliaria **no calcula cuotas ni promete créditos**; eso lo hace el banco.

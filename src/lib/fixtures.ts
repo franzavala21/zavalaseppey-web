@@ -42,6 +42,7 @@ export const FIXTURES: any[] = [
     location: loc(['Colon', 'Salsipuedes']),
     suite_amount: 2, bathroom_amount: 1, surface: '300.00', roofed_surface: '70.00',
     geo_lat: '-31.1379', geo_long: '-64.2955', tags: [tag(1, 'Agua Corriente'), tag(3, 'Parrilla'), tag(2, 'Patio')],
+    custom_tags: [{ id: 1, name: 'Ubicación exacta en web' }], // ejemplo del pin exacto en el mapa
     description: '   En Salsipuedes hay pocas casas a este precio con escritura y planos al día.\n\nDos dormitorios, cocina comedor, baño completo y patio con asador sobre un lote de 300 m².',
   },
   {
