@@ -143,7 +143,9 @@ function nombreLugar(s: string) {
 // Verificado con la API (oct. 2026): credit_eligible viene como "Apto crédito" o "No especificado"
 // Etiqueta (común o personalizada) que habilita el punto exacto en el mapa de la ficha
 const ETIQUETA_UBICACION = /ubicacion exacta/;
-const nombresEtiquetas = (lista: any[] = []) => lista.map((t) => (typeof t === 'string' ? t : t?.name)).filter(Boolean) as string[];
+// Las personalizadas vienen como { name, public_name } (p. ej. name "Web", public_name "Ubicación Exacta En Web"): se miran los dos
+const nombresEtiquetas = (lista: any[] = []) =>
+  lista.flatMap((t) => (typeof t === 'string' ? [t] : [t?.name, t?.public_name])).filter(Boolean) as string[];
 const esEtiquetaUbicacion = (t: string) => ETIQUETA_UBICACION.test(quitarAcentos(t).toLowerCase());
 
 function esAptoCredito(p: any) {
