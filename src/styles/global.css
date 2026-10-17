@@ -261,9 +261,9 @@ p { margin: 0; }
 .ficha__bloque h2 { font-size: 24px; margin-bottom: 14px; }
 .ficha__desc p { font-size: 17px; color: #2C2F33; margin-bottom: 14px; }
 .lista-extras { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 24px; }
-.lista-extras li { display: flex; gap: 10px; align-items: center; }
-.lista-extras li::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--naranja); flex: none; }
-.mapa { width: 100%; height: 340px; border: 0; border-radius: var(--radio); background: #D9DED3; }
+.lista-extras li { display: flex; gap: 12px; align-items: center; }
+.lista-extras svg { flex: none; color: var(--naranja-texto); }
+.mapa { width: 100%; height: 340px; border: 0; border-radius: var(--radio); background: #D9DED3; position: relative; z-index: 0; }
 .video-wrap { position: relative; aspect-ratio: 16 / 9; border-radius: var(--radio); overflow: hidden; background: var(--tinta); }
 .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .contacto-lateral { flex: 1 1 340px; max-width: 100%; position: sticky; top: 20px; background: var(--blanco); border: 1px solid var(--linea); border-radius: 16px; padding: 26px; display: flex; flex-direction: column; gap: 14px; }

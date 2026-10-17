@@ -8,6 +8,7 @@ import { getPropiedades, precioDe, similares, tituloSeo, OPERACIONES, type Propi
 import { urlListado, rutasTipo } from '../../lib/rutas';
 import { breadcrumbJsonLd, propiedadJsonLd, abs } from '../../lib/seo';
 import { formatoNumero, parrafos, resumen } from '../../lib/text';
+import { iconoCaracteristica } from '../../lib/iconos';
 import { fotoWeb } from '../../lib/fotos';
 import { zonaPorSlug } from '../../data/zonas';
 
@@ -48,11 +49,18 @@ const datos = [
 const mensaje = `Hola! Me interesa la propiedad "${p.titulo}" (código ${p.codigo}). ¿Cuándo se puede visitar?`;
 const url = abs(`/propiedad/${p.slug}/`);
 const desc = resumen(`${precio.valor ? precio.texto + '. ' : ''}${p.titulo}. ${p.descripcion}`, 158);
-// Mapa: zona aproximada (coordenadas redondeadas), nunca la ubicación exacta
-const mapa = p.lat && p.lng
+// Mapa: zona aproximada, nunca la ubicación exacta. La coordenada se redondea (~100 m) y el
+// centro del círculo se corre entre ~90 y ~145 m en una dirección fija por propiedad: la casa
+// queda dentro del círculo pero no en el centro.
+const RADIO_ZONA = 350; // metros
+const zonaMapa = p.lat && p.lng
   ? (() => {
-      const la = Math.round(p.lat * 100) / 100, lo = Math.round(p.lng * 100) / 100, d = 0.012;
-      return `https://www.openstreetmap.org/export/embed.html?bbox=${lo - d}%2C${la - d}%2C${lo + d}%2C${la + d}&layer=mapnik`;
+      const h = [...p.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+      const ang = ((h % 360) * Math.PI) / 180;
+      const dist = 0.0008 + (h % 500) / 1e6; // grados de latitud
+      const lat = Math.round(p.lat * 1000) / 1000 + Math.sin(ang) * dist;
+      const lng = Math.round(p.lng * 1000) / 1000 + (Math.cos(ang) * dist) / Math.cos((p.lat * Math.PI) / 180);
+      return { lat: lat.toFixed(5), lng: lng.toFixed(5) };
     })()
   : null;
 const parecidas = similares(todas, p);
@@ -113,7 +121,7 @@ const galeria = await Promise.all(fotos.slice(0, 5).map((f, i) => fotoWeb(f.url,
         {p.etiquetas.length > 0 && (
           <section class="ficha__bloque">
             <h2>Características</h2>
-            <ul class="lista-extras">{p.etiquetas.map((t) => <li>{t}</li>)}</ul>
+            <ul class="lista-extras">{p.etiquetas.map((t) => <li><Fragment set:html={iconoCaracteristica(t)} />{t}</li>)}</ul>
           </section>
         )}
 
@@ -128,7 +136,7 @@ const galeria = await Promise.all(fotos.slice(0, 5).map((f, i) => fotoWeb(f.url,
 
         <section class="ficha__bloque">
           <h2>Ubicación</h2>
-          {mapa && <iframe class="mapa" src={mapa} title={`Mapa de la zona: ${p.ubicacion}`} loading="lazy"></iframe>}
+          {zonaMapa && <div class="mapa" data-mapa data-lat={zonaMapa.lat} data-lng={zonaMapa.lng} data-radio={RADIO_ZONA} role="region" aria-label={`Mapa con la zona aproximada de la propiedad en ${p.ubicacion}`}></div>}
           <p class="nota" style="margin-top:10px">Zona aproximada en {p.ubicacion}. La dirección exacta te la pasamos al coordinar la visita.</p>
         </section>
 
@@ -170,6 +178,27 @@ const galeria = await Promise.all(fotos.slice(0, 5).map((f, i) => fotoWeb(f.url,
 </Base>
 
 <script>
+  // Mapa con la zona aproximada (Leaflet + OpenStreetMap). Se carga recién cuando el mapa se acerca a la pantalla.
+  const contMapa = document.querySelector<HTMLElement>('[data-mapa]');
+  if (contMapa) {
+    const iniciar = async () => {
+      const [{ default: L }] = await Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')]);
+      const { lat, lng, radio } = contMapa.dataset;
+      const mapa = L.map(contMapa, { scrollWheelZoom: false });
+      mapa.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
+      }).addTo(mapa);
+      const centro = L.latLng(Number(lat), Number(lng));
+      mapa.fitBounds(centro.toBounds(Number(radio) * 2), { padding: [24, 24] });
+      L.circle(centro, { radius: Number(radio), color: '#E64E1B', weight: 2, fillColor: '#E64E1B', fillOpacity: 0.18 }).addTo(mapa);
+    };
+    new IntersectionObserver((e, obs) => {
+      if (e[0].isIntersecting) { obs.disconnect(); iniciar(); }
+    }, { rootMargin: '300px' }).observe(contMapa);
+  }
+
   const visor = document.querySelector<HTMLElement>('[data-visor]');
   const datos = document.querySelector('[data-fotos]');
   if (visor && datos) {
