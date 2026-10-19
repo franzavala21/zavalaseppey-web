@@ -1,5 +1,5 @@
 # Vuelve a publicar el sitio cada 6 horas para traer las propiedades nuevas de Tokko.
-# Necesita el secreto VERCEL_DEPLOY_HOOK (GitHub → Settings → Secrets and variables → Actions).
+# Necesita el deploy hook de Vercel como secreto VERCEL_DEPLOY_HOOK (o VERCEL) en GitHub → Settings → Secrets and variables → Actions.
 name: Actualizar propiedades desde Tokko
 
 on:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Pedir a Vercel una nueva publicación
         env:
-          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK || secrets.VERCEL }}
         run: |
-          if [ -z "$HOOK" ]; then echo "Falta el secreto VERCEL_DEPLOY_HOOK"; exit 1; fi
+          if [ -z "$HOOK" ]; then echo "Falta el secreto VERCEL_DEPLOY_HOOK (o VERCEL)"; exit 1; fi
           curl -fsS -X POST "$HOOK"
