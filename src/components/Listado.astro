@@ -3,8 +3,7 @@
 import Migas from './Migas.astro';
 import TarjetaPropiedad from './TarjetaPropiedad.astro';
 import type { Operacion, Propiedad } from '../lib/tokko';
-import { tipoInfo } from '../lib/tokko';
-import { ZONAS } from '../data/zonas';
+import { localidadesDe, tipoInfo } from '../lib/tokko';
 import { waLink } from '../config/site';
 
 interface Props {
@@ -21,7 +20,7 @@ interface Props {
 }
 const { h1, intro, items, op, migas, bloques = [], tituloBloques = '', relacionados = [], filtrosFijos = {}, leerUrl = false } = Astro.props;
 const tipos = [...new Map(items.map((p) => [p.tipoSlug, tipoInfo(p.tipo)])).values()];
-const zonas = ZONAS.filter((z) => items.some((p) => p.zona === z.slug));
+const zonas = localidadesDe(items);
 const hayCredito = items.some((p) => p.aptoCredito);
 ---
 <div class="contenedor" style="padding-block:28px 80px">

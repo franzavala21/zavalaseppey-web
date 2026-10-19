@@ -25,6 +25,7 @@ export type Propiedad = {
   precios: Precio[];
   zona: string | null; // slug de ZONAS, o null si es de otra localidad
   localidad: string; // "Salsipuedes"
+  localidadSlug: string; // para los filtros: el slug de la zona, o el de la localidad si no tiene página ("la-granja")
   barrio: string | null; // "Villa Sol"
   ubicacion: string; // "Bº Villa Sol, Salsipuedes"
   lat: number | null;
@@ -224,6 +225,7 @@ export function normalizar(p: any): Propiedad | null {
     operaciones,
     precios,
     zona: zona?.slug ?? null,
+    localidadSlug: zona?.slug ?? slugify(localidad),
     localidad,
     barrio,
     ubicacion,
@@ -336,6 +338,16 @@ async function fetchConReintentos(url: string, intentos = 3): Promise<Response> 
 
 export function precioDe(p: Propiedad, op?: Operacion) {
   return (op && p.precios.find((x) => x.operacion === op)) || p.precios[0];
+}
+
+/** Localidades con propiedades, para los filtros: primero las zonas con página (en su orden), después el resto por nombre. */
+export function localidadesDe(props: Propiedad[]) {
+  const otras = new Map<string, string>();
+  for (const p of props) if (!p.zona) otras.set(p.localidadSlug, p.localidad);
+  return [
+    ...ZONAS.filter((z) => props.some((p) => p.zona === z.slug)).map((z) => ({ slug: z.slug, nombre: z.nombre })),
+    ...[...otras].map(([slug, nombre]) => ({ slug, nombre })).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')),
+  ];
 }
 
 export function filtrar(props: Propiedad[], f: { operacion?: Operacion; zona?: string; tipoSlug?: string }) {

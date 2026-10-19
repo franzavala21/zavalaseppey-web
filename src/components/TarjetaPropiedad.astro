@@ -27,7 +27,7 @@ const img = foto ? await fotoWeb(foto.url, [480, 800]) : null;
   data-propiedad
   data-op={p.operaciones.join(' ')}
   data-tipo={p.tipoSlug}
-  data-zona={p.zona ?? ''}
+  data-zona={p.localidadSlug}
   data-dorm={p.dormitorios ?? 0}
   data-precio={precio?.valor ?? 0}
   data-moneda={precio?.moneda ?? ''}

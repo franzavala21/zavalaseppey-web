@@ -5,7 +5,7 @@ import Icono from '../components/Icono.astro';
 import { SITE, REVIEWS, waLink } from '../config/site';
 import { ZONAS } from '../data/zonas';
 import { FAQS, GUIAS_PUBLICADAS as GUIAS } from '../data/contenido';
-import { getPropiedades, ordenarRecientes, filtrar, tipoInfo } from '../lib/tokko';
+import { getPropiedades, ordenarRecientes, filtrar, localidadesDe, tipoInfo } from '../lib/tokko';
 import { faqJsonLd } from '../lib/seo';
 
 const todas = await getPropiedades();
@@ -57,7 +57,7 @@ const masBuscado = [
           <label class="buscador__campo">Localidad
             <select name="zona">
               <option value="">Todas</option>
-              {ZONAS.map((z) => <option value={z.slug}>{z.nombre}</option>)}
+              {localidadesDe(todas).map((z) => <option value={z.slug}>{z.nombre}</option>)}
             </select>
           </label>
           <label class="buscador__campo">Dormitorios
