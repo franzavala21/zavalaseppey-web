@@ -20,7 +20,7 @@ Sitio de una inmobiliaria de Salsipuedes (Sierras Chicas, Córdoba, Argentina). 
 8. Accesibilidad: botones y links reales, `alt` en imágenes, contraste AA (usar `--naranja-texto` para texto chico, no `--naranja`).
 
 ## Marca
-Naranja `#E64E1B` (venta) · Verde `#1B6B58` (alquiler / WhatsApp) · Hueso `#F4F2EF` · Tinta `#141517`. Poppins (títulos) + Inter (texto), servidas con @fontsource.
+Naranja `#E64E1B` (venta) · Verde `#1B6B58` (alquiler / WhatsApp) · Hueso `#F4F2EF` · Tinta `#141517`. Montserrat (títulos) + Lato (texto), servidas con @fontsource.
 WhatsApp 351 819-6433 · Av. Pasaje Colón esq. Güemes, Local 7, Salsipuedes.
 
 ## Mapa del código

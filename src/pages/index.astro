@@ -202,7 +202,7 @@ const masBuscado = [
     <h2 class="titulo-seccion" style="margin-bottom:24px">Preguntas frecuentes</h2>
     <div class="faq__lista">
       {FAQS.map((f, i) => (
-        <details open={i === 0}>
+        <details name="faq" open={i === 0}>
           <summary>{f.q}</summary>
           <p>{f.a}</p>
         </details>
@@ -212,6 +212,12 @@ const masBuscado = [
 </Base>
 
 <script>
+  // Preguntas frecuentes: una abierta a la vez. name="faq" ya lo hace en navegadores nuevos; esto cubre los viejos.
+  const faqs = [...document.querySelectorAll<HTMLDetailsElement>('.faq details')];
+  faqs.forEach((d) => d.addEventListener('toggle', () => {
+    if (d.open) faqs.forEach((o) => { if (o !== d) o.open = false; });
+  }));
+
   const form = document.querySelector<HTMLFormElement>('[data-buscador]');
   const op = form?.querySelector<HTMLInputElement>('input[name="op"]');
   form?.querySelectorAll<HTMLButtonElement>('[data-op]').forEach((b) => {
