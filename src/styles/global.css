@@ -158,6 +158,8 @@ p { margin: 0; }
 .tarjeta { position: relative; }
 .tarjeta__lugar { font-size: 14px; color: var(--gris); }
 .tarjeta__datos { margin-top: auto; padding-top: 14px; border-top: 1px solid #EEEAE4; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--gris-2); }
+.tarjeta__datos > span { display: inline-flex; align-items: center; gap: 6px; }
+.tarjeta__datos svg { flex: none; color: var(--naranja-texto); }
 
 /* ---------- Bloques varios ---------- */
 .banda-wa { background: var(--tinta); color: var(--blanco); border-radius: 18px; padding: 40px; display: flex; flex-wrap: wrap; gap: 32px; align-items: center; justify-content: space-between; }

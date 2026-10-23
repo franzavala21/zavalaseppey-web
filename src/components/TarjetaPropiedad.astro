@@ -3,6 +3,7 @@ import type { Operacion, Propiedad } from '../lib/tokko';
 import { precioDe, OPERACIONES } from '../lib/tokko';
 import { formatoNumero } from '../lib/text';
 import { fotoWeb } from '../lib/fotos';
+import { ICONOS_DATOS, svgIcono } from '../lib/iconos';
 
 interface Props { p: Propiedad; op?: Operacion; nivel?: 'h2' | 'h3'; prioridad?: boolean }
 const { p, op, nivel = 'h3', prioridad = false } = Astro.props;
@@ -12,12 +13,13 @@ const Titulo = nivel;
 
 const extra = p.aptoCredito ? 'Apto crédito' : p.etiquetas.find((t) => /permuta|financ|estrenar|escritura|barrio cerrado/i.test(t)) ?? '';
 const datos = [
-  p.dormitorios ? `${p.dormitorios} dorm.` : null,
-  p.banos ? `${p.banos} ${p.banos === 1 ? 'baño' : 'baños'}` : null,
-  p.supCubierta ? `${formatoNumero(p.supCubierta)} m² cub.` : null,
-  p.supTerreno ? `${formatoNumero(p.supTerreno)} m² terreno` : null,
-  p.cocheras ? 'Cochera' : null,
-].filter(Boolean).slice(0, 3);
+  // Ícono + número, como en los portales. El texto completo queda para lectores de pantalla y al pasar el mouse.
+  p.dormitorios ? { icono: ICONOS_DATOS.dormitorios, texto: String(p.dormitorios), oculto: p.dormitorios === 1 ? ' dormitorio' : ' dormitorios', titulo: 'Dormitorios' } : null,
+  p.banos ? { icono: ICONOS_DATOS.banos, texto: String(p.banos), oculto: p.banos === 1 ? ' baño' : ' baños', titulo: 'Baños' } : null,
+  p.supCubierta ? { icono: ICONOS_DATOS.cubierta, texto: `${formatoNumero(p.supCubierta)} m²`, oculto: ' cubiertos', titulo: 'Superficie cubierta' } : null,
+  p.supTerreno ? { icono: ICONOS_DATOS.terreno, texto: `${formatoNumero(p.supTerreno)} m²`, oculto: ' de terreno', titulo: 'Superficie del terreno' } : null,
+  p.cocheras ? { icono: ICONOS_DATOS.cochera, texto: 'Cochera' } : null,
+].filter((d): d is { icono: string; texto: string; oculto?: string; titulo?: string } => Boolean(d)).slice(0, 3);
 const href = `/propiedad/${p.slug}/`;
 const foto = p.fotos[0];
 const img = foto ? await fotoWeb(foto.url, [480, 800]) : null;
@@ -45,6 +47,6 @@ const img = foto ? await fotoWeb(foto.url, [480, 800]) : null;
     <p class="tarjeta__precio">{precio?.texto}</p>
     <Titulo class="tarjeta__titulo"><a href={href}>{p.titulo}</a></Titulo>
     <p class="tarjeta__lugar">{p.ubicacion}</p>
-    {datos.length > 0 && <div class="tarjeta__datos">{datos.map((d) => <span>{d}</span>)}</div>}
+    {datos.length > 0 && <div class="tarjeta__datos">{datos.map((d) => <span title={d.titulo}><Fragment set:html={svgIcono(d.icono, 17)} />{d.texto}{d.oculto && <span class="sr-only">{d.oculto}</span>}</span>)}</div>}
   </div>
 </article>

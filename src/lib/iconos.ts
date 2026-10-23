@@ -52,7 +52,19 @@ const REGLAS: [RegExp, string][] = [
 /** SVG del ícono listo para insertar (decorativo: el texto de la característica va al lado). */
 export function iconoCaracteristica(nombre: string, tam = 20): string {
   const t = quitarAcentos(nombre).toLowerCase();
-  const svg = REGLAS.find(([re]) => re.test(t))?.[1] ?? L.Check;
+  return svgIcono(REGLAS.find(([re]) => re.test(t))?.[1] ?? L.Check, tam);
+}
+
+// Íconos de los datos principales de las tarjetas (dormitorios, baños, superficies, cochera)
+export const ICONOS_DATOS = {
+  dormitorios: L.BedDouble,
+  banos: L.Bath,
+  cubierta: L.House,
+  terreno: L.LandPlot,
+  cochera: L.Car,
+};
+
+export function svgIcono(svg: string, tam = 20): string {
   return svg
     .replace(/<!--.*?-->\s*/s, '')
     .replace(/width="24"/, `width="${tam}"`)
